@@ -2,7 +2,7 @@ import * as React from 'react';
 import Card from 'src/components/Card';
 import {shadowDefault} from 'src/utils/shadow';
 
-function LoadingItemDelivery(props) {
+function LoadingItemOf(props) {
   const {style, ...rest} = props;
   return (
     <Card
@@ -12,4 +12,4 @@ function LoadingItemDelivery(props) {
   );
 }
 
-export default LoadingItemDelivery;
+export default LoadingItemOf;

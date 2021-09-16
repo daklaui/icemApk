@@ -10,11 +10,7 @@ function Loading(props) {
       <ItemComponent key={i} style={i !== count - 1 && {marginBottom: pad}} />,
     );
   }
-  return (
-    <View style={containerStyle}>
-      {results.map(data => data)}
-    </View>
-  );
+  return <View style={containerStyle}>{results.map(data => data)}</View>;
 }
 
 Loading.propsTypes = {

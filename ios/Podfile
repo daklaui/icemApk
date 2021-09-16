@@ -14,6 +14,8 @@ target 'MobileGP' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
+  pod 'RNSweetAlert', :path => '../node_modules/react-native-sweet-alert'
+
   target 'MobileGPTests' do
     inherit! :complete
     # Pods for testing

@@ -6,6 +6,8 @@ import Login from './src/screens/Login';
 import AddUser from 'src/screens/Users/add';
 import ListUsers from 'src/screens/Users/List';
 import Home from 'src/screens/Home';
+import OfLancer from 'src/screens/OF/Lancer';
+import OfUrgent from 'src/screens/OF/ByStatus';
 import {AuthContext} from 'src/utils/auth-context';
 import {loginWithEmail} from 'src/services/auth-service';
 const Stack = createNativeStackNavigator();
@@ -181,6 +183,16 @@ const App = () => {
                 options={{headerShown: false}}
                 name="ListUsers"
                 component={ListUsers}
+              />
+               <Stack.Screen
+                options={{headerShown: false}}
+                name="OfLancer"
+                component={OfLancer}
+              />
+                 <Stack.Screen
+                options={{headerShown: false}}
+                name="OfUrgent"
+                component={OfUrgent}
               />
             </>
           )}

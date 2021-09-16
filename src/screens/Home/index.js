@@ -15,7 +15,7 @@ const Index = () => {
     //{id: 1, title: "Home", color: "#87CEEB", members: 6, image: "https://img.icons8.com/office/70/000000/home-page.png" },
     //{ id: 2, title: "Love", color: "#4682B4", members: 12, image: "https://img.icons8.com/color/70/000000/two-hearts.png" },
     // { id: 3, title: "Family", color: "#6A5ACD", members: 5, image: "https://img.icons8.com/color/70/000000/family.png" },
-   // { id: 4, title: "Utilisateurs", color: "#FF4500", members: 6, image: "https://img.icons8.com/color/70/000000/groups.png" },
+   { id: 1, title: "Of Lancer", color: "#FF4500", members: 6, image: "https://img.icons8.com/color/70/000000/groups.png" },
    // { id: 5, title: "Ajouter Utilisateur", color: "#4682B4", members: 6, image: "https://img.icons8.com/color/70/000000/add-user-male--v1.png" },
     //{ id: 5, title: "School", color: "#00BFFF", members: 7, image: "https://img.icons8.com/color/70/000000/classroom.png" },
     // { id: 6, title: "Things", color: "#00FFFF", members: 8, image: "https://img.icons8.com/dusk/70/000000/checklist.png" },
@@ -30,7 +30,9 @@ const Index = () => {
     // { id: 3, title: "Family", color: "#6A5ACD", members: 5, image: "https://img.icons8.com/color/70/000000/family.png" },
     { id: 4, title: "Utilisateurs", color: "#FF4500", members: 6, image: "https://img.icons8.com/color/70/000000/groups.png" },
     { id: 5, title: "Ajouter Utilisateur", color: "#4682B4", members: 6, image: "https://img.icons8.com/color/70/000000/add-user-male--v1.png" },
-    //{ id: 5, title: "School", color: "#00BFFF", members: 7, image: "https://img.icons8.com/color/70/000000/classroom.png" },
+    { id: 6, title: "Of Lancer", color: "#FF4500", members: 6, image: "https://img.icons8.com/color/70/000000/groups.png" },
+    { id: 6, title: "Of Par Status", color: "#00BFFF", members: 6, image: "https://img.icons8.com/color/70/000000/groups.png" },
+     //{ id: 5, title: "School", color: "#00BFFF", members: 7, image: "https://img.icons8.com/color/70/000000/classroom.png" },
     // { id: 6, title: "Things", color: "#00FFFF", members: 8, image: "https://img.icons8.com/dusk/70/000000/checklist.png" },
     // { id: 8, title: "World", color: "#20B2AA", members: 23, image: "https://img.icons8.com/dusk/70/000000/globe-earth.png" },
     // { id: 9, title: "Remember", color: "#191970", members: 45, image: "https://img.icons8.com/color/70/000000/to-do.png" },
@@ -45,7 +47,12 @@ console.log(user)
       case "Ajouter Utilisateur":
         navigation.navigate('AddUser')
         break;
-
+        case "Of Lancer":
+          navigation.navigate('OfLancer')
+          break;
+          case "Of Par Status":
+            navigation.navigate('OfUrgent')
+            break;
       default:
         break;
     }

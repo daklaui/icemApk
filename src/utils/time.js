@@ -13,3 +13,10 @@ export const getDate = (date = new Date()) => {
   }
   return moment(date).format('dddd, D MMMM, YYYY');
 };
+
+export const getDateCustom = (date = new Date()) => {
+  if (!date) {
+    return null;
+  }
+  return moment(date).format('YYYY-MM-DD');
+};

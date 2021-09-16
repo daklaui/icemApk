@@ -67,7 +67,7 @@ const post = (url, data, method = 'POST', token) => {
   return new Promise((resolve, reject) => {
     const {baseURL} = generalUrl(url);
     const contentType = 'application/json';
-    console.log(data);
+    console.log()
     fetch(baseURL, {
       method: method,
       headers: {
@@ -79,7 +79,7 @@ const post = (url, data, method = 'POST', token) => {
     })
       .then(res => res.json())
       .then(dataApi => {
-        console.log(dataApi);
+       // console.log(dataApi);
         if (dataApi.code) {
           reject(new Error(dataApi.message));
         } else {
