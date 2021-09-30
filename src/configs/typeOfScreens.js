@@ -1,0 +1,17 @@
+export const TypeScreens = {
+  Planification: 'Planification',
+  Magasin: 'Magasin',
+  CoupeReception: 'CoupeReception',
+  IN_coupe: 'IN_coupe',
+  Out_coupe: 'Out_coupe',
+  In_Sertissage: 'In_Sertissage',
+  Out_Sertissage: 'Out_Sertissage',
+  IN_Magasin_fils: 'IN_Magasin_fils',
+  Out_Magasin_fils: 'Out_Magasin_fils',
+  IN_Preparation: 'IN_Preparation',
+  OUT_Preparation: 'OUT_Preparation',
+  IN_UTRA_SON: 'IN_UTRA-SON',
+  OUT_ULTRA_SON: 'OUT_ULTRA-SON',
+  IN_Assemblage: 'IN_Assemblage',
+  Out_Assemblage: 'Out_Assemblage',
+};

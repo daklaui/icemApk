@@ -13,7 +13,7 @@ const get = (url, options = {}, token = null) => {
   return new Promise((resolve, reject) => {
     const {baseURL} = generalUrl(url);
     const contentType = 'application/json';
-    console.log(baseURL);
+    console.log(baseURL, token);
     fetch(baseURL, {
       ...options,
       method: 'GET',

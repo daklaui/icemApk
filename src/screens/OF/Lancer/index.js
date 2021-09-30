@@ -72,7 +72,7 @@ const index = () => {
                 backgroundColor: colors.gray,
                 type: 'delete',
                 onPress: () => {
-                    addOf({ QtProduire: item.quantity, NoOf: item.no, statusOf: 'Urgent' });
+                    addOf({ QtProduire: item.quantity, NoOf: item.no, statusOf: 'Urgent', etat: 'enAttenteDePlanification' });
 
                 },
 
@@ -83,8 +83,8 @@ const index = () => {
                 backgroundColor: colors.secondaryText,
                 type: 'default',
                 onPress: () => {
-                    of.statusOf = 'Normal';
-                    addOf(of);
+                    addOf({ QtProduire: item.quantity, NoOf: item.no, statusOf: 'Normal', etat: 'enAttenteDePlanification' });
+
                 },
             },
         ];

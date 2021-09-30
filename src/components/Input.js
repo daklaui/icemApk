@@ -53,19 +53,16 @@ class Input extends React.Component {
   };
 
   render() {
-    const {
-      label,
-      error,
-      theme,
-      style,
-      multiline,
-      secondary,
-      ...rest
-    } = this.props;
+    const {label, error, theme, style, multiline, secondary, ...rest} =
+      this.props;
     const {isHeading} = this.state;
     const {colors} = theme;
     return (
-      <ViewLabel label={label} error={error} isHeading={isHeading} secondary={secondary}>
+      <ViewLabel
+        label={label}
+        error={error}
+        isHeading={isHeading}
+        secondary={secondary}>
         <TextInput
           autoCapitalize="none"
           {...rest}

@@ -8,10 +8,18 @@ import ListUsers from 'src/screens/Users/List';
 import Home from 'src/screens/Home';
 import OfLancer from 'src/screens/OF/Lancer';
 import OfUrgent from 'src/screens/OF/ByStatus';
+import ValidationOF from 'src/screens/OF/ScreenOfStep';
+import OfMagasin from 'src/screens/OF/OfMagasin';
+import SharedOfScreen from 'src/screens/OF/sharedOfScreen';
 import {AuthContext} from 'src/utils/auth-context';
 import {loginWithEmail} from 'src/services/auth-service';
 const Stack = createNativeStackNavigator();
-
+import * as eva from '@eva-design/eva';
+import {
+  ApplicationProvider,
+  Layout,
+  Text as Textkitten,
+} from '@ui-kitten/components';
 const App = () => {
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
@@ -158,47 +166,64 @@ const App = () => {
     [],
   );
   return (
-    <NavigationContainer>
-      <AuthContext.Provider value={{...authContext, ...state}}>
-        <Stack.Navigator>
-          {state.userToken == null ? (
-            <Stack.Screen
-              options={{headerShown: false}}
-              name="LoginScreen"
-              component={Login}
-            />
-          ) : (
-            <>
+    <ApplicationProvider {...eva} theme={eva.light}>
+      <NavigationContainer>
+        <AuthContext.Provider value={{...authContext, ...state}}>
+          <Stack.Navigator>
+            {state.userToken == null ? (
               <Stack.Screen
                 options={{headerShown: false}}
-                name="Home"
-                component={Home}
+                name="LoginScreen"
+                component={Login}
               />
-              <Stack.Screen
-                options={{headerShown: false}}
-                name="AddUser"
-                component={AddUser}
-              />
-              <Stack.Screen
-                options={{headerShown: false}}
-                name="ListUsers"
-                component={ListUsers}
-              />
-               <Stack.Screen
-                options={{headerShown: false}}
-                name="OfLancer"
-                component={OfLancer}
-              />
-                 <Stack.Screen
-                options={{headerShown: false}}
-                name="OfUrgent"
-                component={OfUrgent}
-              />
-            </>
-          )}
-        </Stack.Navigator>
-      </AuthContext.Provider>
-    </NavigationContainer>
+            ) : (
+              <>
+                <Stack.Screen
+                  options={{headerShown: false}}
+                  name="Home"
+                  component={Home}
+                />
+                <Stack.Screen
+                  options={{headerShown: false}}
+                  name="AddUser"
+                  component={AddUser}
+                />
+                <Stack.Screen
+                  options={{headerShown: false}}
+                  name="ListUsers"
+                  component={ListUsers}
+                />
+                <Stack.Screen
+                  options={{headerShown: false}}
+                  name="OfLancer"
+                  component={OfLancer}
+                />
+                <Stack.Screen
+                  options={{headerShown: false}}
+                  name="OfUrgent"
+                  component={OfUrgent}
+                />
+                <Stack.Screen
+                  options={{headerShown: false}}
+                  name="validationOf"
+                  component={ValidationOF}
+                />
+                <Stack.Screen
+                  options={{headerShown: false}}
+                  name="sahredOfScreen"
+                  component={SharedOfScreen}
+                />
+                <Stack.Screen
+                  options={{headerShown: false}}
+                  name="ofMagasin"
+                  component={OfMagasin}
+                />
+              </>
+            )}
+          </Stack.Navigator>
+        </AuthContext.Provider>
+      </NavigationContainer>
+    </ApplicationProvider>
   );
 };
 
