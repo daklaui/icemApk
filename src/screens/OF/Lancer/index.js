@@ -13,8 +13,9 @@ import { colors } from 'react-native-elements';
 import { getDateCustom } from 'src/utils/time';
 import { addNewOfATracker } from '../../../services/of-services';
 import SweetAlert from 'react-native-sweet-alert';
+import AnimatedLoader from 'react-native-animated-loader';
 const index = () => {
-
+    const [visible, setVisible] = useState(true);
     const navigation = useNavigation();
     const { user, signOut, userToken } = React.useContext(AuthContext);
     const [ofList, setOfList] = useState([]);
@@ -23,6 +24,7 @@ const index = () => {
         getAllOfs(userToken).then((result) => {
             //   console.log(result);
             setOfList(result);
+            setVisible(false)
         }).catch((err) => {
             console.log(err);
         });
@@ -59,6 +61,7 @@ const index = () => {
                 cancellable: true
             },
                 callback => console.log('callback'));
+            setOfList([])
             setOfList(result)
         }).catch((e) => {
             console.log(e)
@@ -73,7 +76,6 @@ const index = () => {
                 type: 'delete',
                 onPress: () => {
                     addOf({ QtProduire: item.quantity, NoOf: item.no, statusOf: 'Urgent', etat: 'enAttenteDePlanification' });
-
                 },
 
             },
@@ -116,7 +118,13 @@ const index = () => {
                     />
                 }
             />
-            <FlatList
+            <AnimatedLoader
+                visible={visible}
+                overlayColor="rgba(255,255,255,0.75)"
+                animationStyle={styles.lottie}
+                speed={1}>
+            </AnimatedLoader>
+            {!visible && <FlatList
                 style={styles.tasks}
                 columnWrapperStyle={styles.listContainer}
                 data={ofList}
@@ -147,11 +155,16 @@ const index = () => {
                             </TouchableOpacity>
                         </Swipeout>
                     );
-                }} />
+                }} />}
+
         </View>
     );
 };
 const styles = StyleSheet.create({
+    lottie: {
+        width: 100,
+        height: 100,
+    },
     container: {
         flex: 1,
         marginTop: 20,

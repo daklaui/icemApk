@@ -9,14 +9,19 @@ import { colors } from 'react-native-elements';
 import { getDateCustom } from 'src/utils/time';
 import { getOfsByStatus } from 'src/services/of-services';
 import { updateStateOf } from '../../../services/of-services';
+import SweetAlert from 'react-native-sweet-alert';
+import AnimatedLoader from 'react-native-animated-loader';
 const OfsByStatus = props => {
     const { route } = props;
     const navigation = useNavigation();
     const statusOf = route?.name;
     const { userToken } = React.useContext(AuthContext);
     const [ofList, setOfList] = useState([]);
+    const [stateChanged, setIsStateChanged] = useState(false);
     const { colors } = themeColors.themeLight;
+    const [visible, setVisible] = useState(true);
     useEffect(() => {
+        setVisible(false);
         let status = '';
         switch (statusOf) {
             case 'ofNormal':
@@ -30,10 +35,11 @@ const OfsByStatus = props => {
         }
         getOfsByStatus(userToken, status).then((result) => {
             setOfList(result);
+            setVisible(false);
         }).catch((err) => {
             console.log(err);
         });
-    }, []);
+    }, [stateChanged]);
     const getCompletedIcon = (item) => {
         return 'https://img.icons8.com/flat_round/64/000000/checkmark.png';
         /*  if (item.completed == 1) {
@@ -49,13 +55,46 @@ const OfsByStatus = props => {
           }
       };*/
     const changeStateOf = (item) => {
-        updateStateOf(userToken, { etat: "Magasin", idOf: item.trackOf.idOf }).then((resp) => {
-            console.log(resp)
-        })
+        Alert.alert(
+            "Confirmation",
+            "Envoyer l'of en fil d'attente de coupe",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                {
+                    text: "OK", onPress: () => {
+                        updateStateOf(userToken, { etat: "Magasin", idOf: item.trackOf.idOf }).then((resp) => {
+                            SweetAlert.showAlertWithOptions({
+                                title: '',
+                                subTitle: 'enregistrement a été effectué avec succès.',
+                                confirmButtonTitle: 'OK',
+                                confirmButtonColor: '#000',
+                                otherButtonTitle: 'Cancel',
+                                otherButtonColor: '#dedede',
+                                style: 'success',
+                                cancellable: true
+                            },
+                                callback => console.log('callback'));
+                            setIsStateChanged(!stateChanged)
+                        })
+
+                    }
+                }
+            ]
+        );
     }
     return (
         <View style={styles.container}>
-            <FlatList
+            <AnimatedLoader
+                visible={visible}
+                overlayColor="rgba(255,255,255,0.75)"
+                animationStyle={styles.lottie}
+                speed={1}>
+            </AnimatedLoader>
+            {!visible && <FlatList
                 style={styles.tasks}
                 columnWrapperStyle={styles.listContainer}
                 data={ofList}
@@ -86,7 +125,7 @@ const OfsByStatus = props => {
                         </TouchableOpacity>
 
                     );
-                }} />
+                }} />}
         </View>
     );
 };

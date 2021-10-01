@@ -15,3 +15,21 @@ export const TypeScreens = {
   IN_Assemblage: 'IN_Assemblage',
   Out_Assemblage: 'Out_Assemblage',
 };
+
+export const TitreOfScreens = {
+  ScreenMagasin: 'Ofs dans magasin',
+  ScreenCoupeReception: 'Ofs En attendant la coupe',
+  ScreenIN_coupe: 'Ofs en cours de la coupe',
+  ScreenOut_coupe: 'Ofs Sortie de la coupe',
+  ScreenIn_Sertissage: 'Ofs en cours de la sertissage',
+  ScreenOut_Sertissage: 'Ofs Sortie de la sertissage',
+  ScreenIN_Magasin_fils: 'Ofs dans magasin des fil',
+  ScreenOut_Magasin_fils: 'Ofs Sortie de la magasin des fil',
+  ScreenIN_Preparation: 'Ofs en cours de la preparation',
+  ScreenOUT_Preparation: 'Ofs Sortie de la preparation',
+  ScreenIN_UTRA_SON: 'Ofs en cours de UTRA-SON',
+  ScreenOUT_ULTRA_SON: 'Ofs Sortie de la ULTRA-SON',
+  ScreenIN_Assemblage: "Ofs en cours de l'assemblage",
+  ScreenOut_Assemblage: "Ofs Sortie de l'assemblage",
+  ScreenProduction: "Les produits fini",
+};

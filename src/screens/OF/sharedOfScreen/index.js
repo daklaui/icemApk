@@ -1,16 +1,17 @@
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { AuthContext } from 'src/utils/auth-context';
 import Text from 'src/components/Text';
 import * as themeColors from 'src/configs/themes';
 import { colors } from 'react-native-elements';
 import { getDateCustom } from 'src/utils/time';
-import { getOfsByEtat, updateStateOf } from '../../../services/of-services';
+import { getOfsByEtat } from '../../../services/of-services';
 import Header from 'src/containers/Header';
 import Icon from 'src/components/Icon';
 import { TypeScreens } from '../../../configs/typeOfScreens';
+import AnimatedLoader from 'react-native-animated-loader';
 const Index = props => {
     const { route } = props;
     const navigation = useNavigation();
@@ -19,60 +20,42 @@ const Index = props => {
     const { userToken } = React.useContext(AuthContext);
     const [ofList, setOfList] = useState([]);
     const { colors } = themeColors.themeLight;
+    const [visible, setVisible] = useState(true);
 
     const etatOf = () => {
         switch (TypeOfScreen) {
             case TypeScreens.Magasin: return 'Magasin';
             case TypeScreens.CoupeReception: return 'CoupeReception';
-            case TypeScreens.IN_coupe: return 'InCoupe';
-            case TypeScreens.Out_coupe: return 'OutCoupe';
-            case TypeScreens.In_Sertissage: return 'InSertisage';
-            case TypeScreens.Out_Sertissage: return 'OutSertisage';
-            case TypeScreens.IN_Magasin_fils: return 'InMagasinFile';
-            case TypeScreens.Out_Magasin_fils: return 'OutMagasinFile';
-            case TypeScreens.IN_Preparation: return 'InPreparation';
-            case TypeScreens.OUT_Preparation: return 'OutPreparation';
-            case TypeScreens.IN_UTRA_SON: return 'InSodureUltraSon';
-            case TypeScreens.OUT_ULTRA_SON: return 'OutSodureUltraSon';
-            case TypeScreens.IN_Assemblage: return 'inAssemblage';
-            case TypeScreens.Out_Assemblage: return 'OutAssemblage';
+            case TypeScreens.IN_coupe: return 'IN_coupe';
+            case TypeScreens.Out_coupe: return 'Out_coupe';
+            case TypeScreens.In_Sertissage: return 'In_Sertissage';
+            case TypeScreens.Out_Sertissage: return 'Out_Sertissage';
+            case TypeScreens.IN_Magasin_fils: return 'IN_Magasin_fils';
+            case TypeScreens.Out_Magasin_fils: return 'Out_Magasin_fils';
+            case TypeScreens.IN_Preparation: return 'IN_Preparation';
+            case TypeScreens.OUT_Preparation: return 'OUT_Preparation';
+            case TypeScreens.IN_UTRA_SON: return 'IN_UTRA_SON';
+            case TypeScreens.OUT_ULTRA_SON: return 'OUT_ULTRA_SON';
+            case TypeScreens.IN_Assemblage: return 'IN_Assemblage';
+            case TypeScreens.Out_Assemblage: return 'Out_Assemblage';
             default: return ''
         }
     };
-    const nextEtatOf = (etat) => {
-        switch (etat) {
-            case TypeScreens.Magasin: return 'CoupeReception';
-            case TypeScreens.CoupeReception: return 'InCoupe';
-            case TypeScreens.IN_coupe: return 'OutCoupe';
-            case TypeScreens.Out_coupe: return 'InSertisage';
-            case TypeScreens.In_Sertissage: return 'OutSertisage';
-            case TypeScreens.Out_Sertissage: return 'InMagasinFile';
-            case TypeScreens.IN_Magasin_fils: return 'OutMagasinFile';
-            case TypeScreens.Out_Magasin_fils: return 'InPreparation';
-            case TypeScreens.IN_Preparation: return 'OutPreparation';
-            case TypeScreens.OUT_Preparation: return 'InSodureUltraSon';
-            case TypeScreens.IN_UTRA_SON: return 'OutSodureUltraSon';
-            case TypeScreens.OUT_ULTRA_SON: return 'inAssemblage';
-            case TypeScreens.IN_Assemblage: return 'OutAssemblage';
-            case TypeScreens.Out_Assemblage : return 'produitFini';
-            default: return ''
-        }
-    };
+
     useEffect(() => {
-        console.log(TypeOfScreen)
         let x = etatOf();
+        setVisible(true)
         getOfsByEtat(userToken, x).then((result) => {
             setOfList(result);
+            setVisible(false)
         }).catch((err) => {
             console.log(err);
         });
-    }, []);
+        return () => {
+            setOfList([]);
+        };
+    }, [useIsFocused()]);
 
-    const changeStateOf = (item) => {
-        updateStateOf(userToken, { etat: nextEtatOf(item.trackOf.etat), idOf: item.trackOf.idOf }).then((resp) => {
-            console.log(resp);
-        });
-    };
     return (
         <View style={styles.container}>
             <Header
@@ -91,7 +74,13 @@ const Index = props => {
                     </Text>
                 }
             />
-            <FlatList
+            <AnimatedLoader
+                visible={visible}
+                overlayColor="rgba(255,255,255,0.75)"
+                animationStyle={styles.lottie}
+                speed={1}>
+            </AnimatedLoader>
+            {!visible && <FlatList
                 style={styles.tasks}
                 columnWrapperStyle={styles.listContainer}
                 data={ofList}
@@ -122,7 +111,7 @@ const Index = props => {
                         </TouchableOpacity>
 
                     );
-                }} />
+                }} />}
         </View>
     );
 };

@@ -18,11 +18,12 @@ const urlImage = require('src/assets/images/avatar7.png');
 import { AuthContext } from 'src/utils/auth-context';
 import { deleteUSer } from 'src/services/users-service';
 import { useNavigation } from '@react-navigation/native';
-const Index = ({navigation}) => {
+import AnimatedLoader from 'react-native-animated-loader';
+const Index = ({ navigation }) => {
   const { userToken, signOut } = React.useContext(AuthContext);
   const { colors } = themeColors.themeLight;
   const navigationD = useNavigation();
-  console.log(colors.border);
+  const [visible, setVisible] = useState(true);
   const swipeoutBtns = (item) => {
     return [
       {
@@ -42,7 +43,7 @@ const Index = ({navigation}) => {
         backgroundColor: colors.secondaryText,
         type: 'default',
         onPress: () => {
-          navigationD.navigate('AddUser', { edit: true , id : item.idUser });
+          navigationD.navigate('AddUser', { edit: true, id: item.idUser });
         },
       },
     ];
@@ -51,22 +52,27 @@ const Index = ({navigation}) => {
   // eslint-disable-next-line no-undef
   const [remove, setIsRemove] = useState(false);
   useEffect(() => {
+    setVisible(true)
     getAllUsers(userToken).then((d) => {
       if (d.message && d.message === 'Unauthorized') {
         signOut();
       }
-      console.log(d)
+      setData([]);
       setData(d);
+      setVisible(false)
     });
 
   }, [remove]);
   React.useEffect(() => {
+    setVisible(true)
     const unsubscribe = navigation.addListener('focus', () => {
       getAllUsers(userToken).then((d) => {
         if (d.message && d.message === 'Unauthorized') {
           signOut();
         }
+        setData([]);
         setData(d);
+        setVisible(false)
       });
     });
     return unsubscribe;
@@ -99,32 +105,39 @@ const Index = ({navigation}) => {
             isRotateRTL
           />}
       />
-      <KeyboardAvoidingView behavior="height" style={styles.keyboard}>
+      <AnimatedLoader
+        visible={visible}
+        overlayColor="rgba(255,255,255,0.75)"
+        animationStyle={styles.lottie}
+        speed={1}>
+      </AnimatedLoader>
+      {!visible &&
+        <KeyboardAvoidingView behavior="height" style={styles.keyboard}>
 
-        <FlatList
-          style={styles.userList}
-          columnWrapperStyle={styles.listContainer}
-          data={data}
-          keyExtractor={(item) => {
-            return item.id;
-          }}
-          renderItem={({ item }) => {
-            return (
-              <Swipeout style={{ backgroundColor: colors.background }} right={swipeoutBtns(item)}>
-                <View style={styles.card} >
-                  <Image style={styles.image} source={urlImage} />
-                  <View style={styles.cardContent}>
-                    <Text style={styles.name}>{item.userName}</Text>
-                    <Text style={styles.position}>{item.idRole}</Text>
+          <FlatList
+            style={styles.userList}
+            columnWrapperStyle={styles.listContainer}
+            data={data}
+            keyExtractor={(item) => {
+              return item.id;
+            }}
+            renderItem={({ item }) => {
+              return (
+                <Swipeout style={{ backgroundColor: colors.background }} right={swipeoutBtns(item)}>
+                  <View style={styles.card} >
+                    <Image style={styles.image} source={urlImage} />
+                    <View style={styles.cardContent}>
+                      <Text style={styles.name}>{item.userName}</Text>
+                      <Text style={styles.position}>{item.idRole}</Text>
+                    </View>
                   </View>
-                </View>
-              </Swipeout>
-            );
-          }}
+                </Swipeout>
+              );
+            }}
 
 
-        />
-      </KeyboardAvoidingView>
+          />
+        </KeyboardAvoidingView>}
     </View>
   );
 };
@@ -132,6 +145,7 @@ const Index = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: 20,
     //backgroundColor: '#FFF',
   },
   keyboard: {

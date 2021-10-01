@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#FFF',
-
+        marginTop: 20,
     },
     keyboard: {
         flex: 1,
