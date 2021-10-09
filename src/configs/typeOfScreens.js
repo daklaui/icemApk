@@ -10,10 +10,11 @@ export const TypeScreens = {
   Out_Magasin_fils: 'Out_Magasin_fils',
   IN_Preparation: 'IN_Preparation',
   OUT_Preparation: 'OUT_Preparation',
-  IN_UTRA_SON: 'IN_UTRA-SON',
-  OUT_ULTRA_SON: 'OUT_ULTRA-SON',
+  IN_UTRA_SON: 'IN_UTRA_SON',
+  OUT_ULTRA_SON: 'OUT_ULTRA_SON',
   IN_Assemblage: 'IN_Assemblage',
   Out_Assemblage: 'Out_Assemblage',
+  ProduitFini: 'produitFini',
 };
 
 export const TitreOfScreens = {

@@ -10,3 +10,5 @@ export const addNewOfATracker = (userToken, of) =>
   request.post('Of/addTrackNewOf', JSON.stringify(of), 'POST', userToken);
 export const updateStateOf = (userToken, of) =>
   request.post('Of/changeStateOf', JSON.stringify(of), 'PUT', userToken);
+export const getCountOfByEtat = userToken =>
+  request.get('Of/getCountOfByEtat', {}, userToken);

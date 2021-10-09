@@ -31,7 +31,7 @@ const index = () => {
 
     }, []);
     const clickEventListener = (item) => {
-        Alert.alert('Item selected: ' + item.description);
+        Alert.alert(item.description);
     };
 
     const getCompletedIcon = (item) => {

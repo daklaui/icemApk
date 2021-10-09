@@ -88,7 +88,15 @@ const Index = props => {
                     return item.id;
                 }}
                 renderItem={({ item }) => {
-                    let borderColor = item.trackOf.statusOf === 'Urgent' ? '#FF4500' : null;
+                    let borderColor;//= item.trackOf.statusOf.includes('Urgent') ? '#FF4500' : null;
+                    switch (item.trackOf.statusOf) {
+                        case "Urgent": borderColor = '#FF4500'; break;
+                        case "Urgent,Partiel": borderColor = '#FFCC00'; break;
+                        case "Normal,Partiel": borderColor = '#FF9966'; break;
+                        default: borderColor = null; break;
+                    }
+
+
                     return (
 
                         <TouchableOpacity style={[styles.card, { borderColor: borderColor }]} onPress={() => navigation.navigate('validationOf', { item: item })}>

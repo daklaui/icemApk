@@ -15,7 +15,7 @@ const index = (props) => {
   const { navigation, route } = props;
   const { userToken } = React.useContext(AuthContext);
   const item = route?.params?.item ?? null;
-  const [isOn, setIsOn] = useState(false);
+  const [isOn, setIsOn] = useState(true);
   const [loader, setLoader] = useState(false);
   const [qty, setQty] = useState('');
   const [cmntr, setCmntr] = useState('');
@@ -109,7 +109,13 @@ const index = (props) => {
     if (Number(qty) <= Number(item.trackOf.qtProduire)) {
       setLoader(true);
       let x = screenToBack(item.trackOf.etat);
-      updateStateOf(userToken, { etat: nextEtatOf(item.trackOf.etat), idOf: item.trackOf.idOf, QtProduire: Number(qty), Commentaire: cmntr ? cmntr : '' }).then((resp) => {
+      updateStateOf(userToken, {
+        etat: nextEtatOf(item.trackOf.etat),
+        idOf: item.trackOf.idOf,
+        statusOf: (isOn).toString(),
+        QtProduire: Number(qty),
+        Commentaire: cmntr ? cmntr : ''
+      }).then((resp) => {
         navigation.navigate('sahredOfScreen',
           {
             titreOfScreen: x.titreOfScreen,
@@ -117,7 +123,7 @@ const index = (props) => {
           });
         setLoader(false);
       });
-    }else{
+    } else {
       SweetAlert.showAlertWithOptions({
         title: 'Error',
         subTitle: "La quantité saisie est supérieure à la quantité de l'Of",
