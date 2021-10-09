@@ -1,0 +1,8 @@
+- partiel non eliminer de ofs magasin
+
+- reporting etat of
+
+
+--> OF01 QT = 100
+  --> QT = 50 ===> partiel
+  
