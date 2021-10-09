@@ -12,3 +12,5 @@ export const updateStateOf = (userToken, of) =>
   request.post('Of/changeStateOf', JSON.stringify(of), 'PUT', userToken);
 export const getCountOfByEtat = userToken =>
   request.get('Of/getCountOfByEtat', {}, userToken);
+export const GetHistoriqueOf = (userToken, no) =>
+  request.get('Of/GetHistoriqueOf/' + no, {}, userToken);

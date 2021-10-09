@@ -19,6 +19,7 @@ const Index = () => {
     let menu = [
       { id: 1, title: 'Utilisateurs', color: '#FF4500', members: '', image: 'https://img.icons8.com/color/70/000000/groups.png' },
       { id: 2, title: 'Ajouter Utilisateur', color: '#4682B4', members: '', image: 'https://img.icons8.com/color/70/000000/add-user-male--v1.png' },
+      { id: 19, title: 'Of Historique', color: '#FF4500', members: '', image: 'https://img.icons8.com/color/70/000000/to-do.png' },
       { id: 3, title: 'Of Lancer', color: '#191970', members: 0, image: 'https://img.icons8.com/color/70/000000/checklist.png' },
       { id: 4, title: 'Of Par Status', color: '#191970', members: 0, image: 'https://img.icons8.com/color/70/000000/checklist.png' },
       { id: 5, title: 'Of Magasin', color: '#00BFFF', members: 5, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
@@ -35,6 +36,7 @@ const Index = () => {
       { id: 16, title: 'Of Out SODURE UTRA-SON', color: '#87CEEB', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
       { id: 17, title: 'Of In Assemblage', color: '#FF69B4', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
       { id: 18, title: 'Of Out Assemblage', color: '#FF69B4', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+  
     ];
     let i = 0;
     getCountOfByEtat(userToken).then((resp) => {
@@ -76,6 +78,9 @@ const Index = () => {
         break;
       case 'Of Par Status':
         navigation.navigate('OfUrgent');
+        break;
+      case 'Of Historique':
+        navigation.navigate('historqueOf');
         break;
       case 'Of Magasin':
         navigation.navigate('sahredOfScreen',

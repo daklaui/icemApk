@@ -18,5 +18,5 @@ export const getDateCustom = (date = new Date()) => {
   if (!date) {
     return null;
   }
-  return moment(date).format('YYYY-MM-DD');
+  return moment(date).format('YYYY-MM-DD h:mm a');
 };

@@ -10,6 +10,8 @@ import OfLancer from 'src/screens/OF/Lancer';
 import OfUrgent from 'src/screens/OF/ByStatus';
 import ValidationOF from 'src/screens/OF/ScreenOfStep';
 import SharedOfScreen from 'src/screens/OF/sharedOfScreen';
+import HistoriqueOf from 'src/screens/OF/HistoriqueOf';
+import HistoriqueOfDetail from 'src/screens/OF/HistoriqueOf/historique';
 import {AuthContext} from 'src/utils/auth-context';
 import {loginWithEmail} from 'src/services/auth-service';
 const Stack = createNativeStackNavigator();
@@ -211,6 +213,16 @@ const App = () => {
                   options={{headerShown: false}}
                   name="sahredOfScreen"
                   component={SharedOfScreen}
+                />
+                <Stack.Screen
+                  options={{headerShown: false}}
+                  name="historqueOf"
+                  component={HistoriqueOf}
+                />
+                <Stack.Screen
+                  options={{headerShown: false}}
+                  name="historqueOfDetail"
+                  component={HistoriqueOfDetail}
                 />
               </>
             )}
