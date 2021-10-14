@@ -61,9 +61,9 @@ const Index = () => {
           case 'Out_Assemblage': menu.find(p => p.id === 18).members = item.nomber; break;
         }
       });
-      setMenuAdmin(menu);
+      setMenuAdmin(menu); 
     });
-  }, [menuAdmin]);
+  }, []);
   //console.log(user)
   const clickEventListener = item => {
     switch (item) {

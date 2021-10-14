@@ -14,3 +14,7 @@ export const getCountOfByEtat = userToken =>
   request.get('Of/getCountOfByEtat', {}, userToken);
 export const GetHistoriqueOf = (userToken, no) =>
   request.get('Of/GetHistoriqueOf/' + no, {}, userToken);
+export const GetOfTracksByOfName = (userToken, no, etat, date) =>
+  date
+    ? request.get(`Of/GetOfTracksByOfName/${no}/${etat}/${date}`, {}, userToken)
+    : request.get(`Of/GetOfTracksByOfName/${no}/${etat}`, {}, userToken);
