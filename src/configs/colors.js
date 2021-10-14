@@ -18,3 +18,14 @@ export const red = '#FA163F';
 export const yellow = '#FFCD3C';
 export const blue = '#2daae1';
 export const blueLight = '#EFFFDB'; //bg_screens
+
+export const StatusColors = {
+  Urgent: red,
+  Normal: green,
+  Retard: yellow,
+  StoppeP: '#000075',
+  StoppeQ: black,
+  Annuler: '#8B0000',
+  UrgentPartielle: '#FF4500',
+  NormalPartielle: '#9efd38',
+};

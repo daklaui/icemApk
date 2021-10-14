@@ -14,6 +14,14 @@ export const getCountOfByEtat = userToken =>
   request.get('Of/getCountOfByEtat', {}, userToken);
 export const GetHistoriqueOf = (userToken, no) =>
   request.get('Of/GetHistoriqueOf/' + no, {}, userToken);
+export const GetUsersByEtat = (userToken, etat) =>
+  request.get(`User/getUsersByEtat/${etat}`, {}, userToken);
+export const getSearchUsersByEtat = (userToken, etat, username) =>
+  request.get(`User/getSearchUsersByEtat/${etat}/${username}`, {}, userToken);
+export const GetOfByActionneur = (userToken, etat, username) =>
+  request.get(`Of/GetOfByActionneur/${etat}/${username}`, {}, userToken);
+export const getOfByEtatStatus = (userToken, etat, status) =>
+  request.get(`Of/getOfByEtatStatus/${etat}/${status}`, {}, userToken);
 export const GetOfTracksByOfName = (userToken, no, etat, date) =>
   date
     ? request.get(`Of/GetOfTracksByOfName/${no}/${etat}/${date}`, {}, userToken)

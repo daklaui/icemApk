@@ -7,7 +7,7 @@ import Text from 'src/components/Text';
 import * as themeColors from 'src/configs/themes';
 import { colors } from 'react-native-elements';
 import { getDateCustom } from 'src/utils/time';
-import { getOfsByEtat, GetOfTracksByOfName } from '../../../services/of-services';
+import { GetOfByActionneur, getOfByEtatStatus, getOfByStatus, getOfsByEtat, GetOfTracksByOfName, getSearchUsersByEtat, GetUsersByEtat } from '../../../services/of-services';
 import Header from 'src/containers/Header';
 import Icon from 'src/components/Icon';
 import { TypeScreens } from '../../../configs/typeOfScreens';
@@ -16,6 +16,7 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import SearchBar from '@nghinv/react-native-search-bar';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { getDateCustomApi } from '../../../utils/time';
+import { StatusColors } from '../../../configs/colors';
 const Index = props => {
     const { route } = props;
     const navigation = useNavigation();
@@ -49,7 +50,9 @@ const Index = props => {
         }
     };
     const [text, setText] = useState(null);
+    const [searchUserText, setUserSearchText] = useState(null);
     const [timer, setTimer] = useState(null);
+    const [users, setUsers] = useState([]);
     const [currenDate, setCurrentDate] = useState(new Date());
 
     LocaleConfig.locales.fr = {
@@ -84,7 +87,30 @@ const Index = props => {
             }, valueOfCounter)
         );
     }
+    const onChangeSearchUserText = (value) => {
+        setUserSearchText(value);
+        changeDelayUser(value.length > 0 ? value : null);
+    }
 
+    function changeDelayUser(change) {
+        let valueOfCounter = change !== null && change.length > 0 ? 700 : 0;
+        if (timer) {
+            clearTimeout(timer);
+            setTimer(null);
+        }
+        setTimer(
+            setTimeout(() => {
+                let x = etatOf();
+                setVisible(true);
+                getSearchUsersByEtat(userToken, x, change).then((result) => {
+                    setUsers(result);
+                    setVisible(false);
+                }).catch((err) => {
+                    console.log(err);
+                });
+            }, valueOfCounter)
+        );
+    }
     const serachByDay = (value) => {
 
         let x = etatOf();
@@ -98,7 +124,31 @@ const Index = props => {
             console.log(err);
         });
     }
+    const searchByUserFn = (username) => {
+        searchByUser.current.close()
+        let x = etatOf();
+        setVisible(true);
+        GetOfByActionneur(userToken, x, username).then((result) => {
+            setOfList(result);
+            setVisible(false);
+        }).catch((err) => {
+            console.log(err);
+        });
 
+    }
+    const searchByStatusFn = (status) => {
+        searchByStatus.current.close()
+        let x = etatOf();
+        setVisible(true);
+        getOfByEtatStatus(userToken, x, status).then((result) => {
+            setOfList(result);
+            setVisible(false);
+        }).catch((err) => {
+            console.log(err);
+        });
+
+    }
+    
     useEffect(() => {
         let x = etatOf();
         setVisible(true);
@@ -108,8 +158,15 @@ const Index = props => {
         }).catch((err) => {
             console.log(err);
         });
+        GetUsersByEtat(userToken, x).then((result) => {
+            console.log(result)
+            setUsers(result);
+        }).catch((err) => {
+            console.log(err);
+        });
         return () => {
             setOfList([]);
+            setUsers([]);
         };
     }, [useIsFocused()]);
 
@@ -164,10 +221,14 @@ const Index = props => {
                 renderItem={({ item }) => {
                     let borderColor;//= item.trackOf.statusOf.includes('Urgent') ? '#FF4500' : null;
                     switch (item.trackOf.statusOf) {
-                        case 'Urgent': borderColor = '#FF4500'; break;
-                        case 'Urgent,Partiel': borderColor = '#FFCC00'; break;
-                        case 'Normal,Partiel': borderColor = '#FF9966'; break;
-                        default: borderColor = null; break;
+                        case 'Urgent': borderColor = StatusColors.Urgent; break;
+                        case 'Urgent,Partiel': borderColor = StatusColors.UrgentPartielle; break;
+                        case 'Normal,Partiel': borderColor = StatusColors.NormalPartielle; break;
+                        case 'Retard': borderColor = StatusColors.Retard; break;
+                        case 'StoppeP': borderColor = StatusColors.StoppeP; break;
+                        case 'StoppeQ': borderColor = StatusColors.StoppeQ; break;
+                        case 'Annuler': borderColor = StatusColors.Annuler; break;
+                        default: borderColor = StatusColors.Normal; break;
                     }
 
 
@@ -298,75 +359,75 @@ const Index = props => {
                     <View style={styles.gridContainer}>
                         <TouchableOpacity
                             key={"0"}
-                            onPress={() => console.log()}
+                            onPress={() => searchByStatusFn("Normal")}
                             style={styles.gridButtonContainer}
                         >
-                            <View style={[styles.gridButton, { backgroundColor: "#000000" }]}>
+                            <View style={[styles.gridButton, { backgroundColor: StatusColors.Normal }]}>
                                 <Text style={styles.gridLabel}>Normal</Text>
                             </View>
 
                         </TouchableOpacity>
                         <TouchableOpacity
                             key={"1"}
-                            onPress={() => console.log()}
+                            onPress={() => searchByStatusFn("Urgent")}
                             style={styles.gridButtonContainer}
                         >
-                            <View style={[styles.gridButton, { backgroundColor: "#9C1C6B" }]}>
+                            <View style={[styles.gridButton, { backgroundColor: StatusColors.Urgent }]}>
                                 <Text style={styles.gridLabel}>Urgent</Text>
                             </View>
 
                         </TouchableOpacity>
                         <TouchableOpacity
                             key={"2"}
-                            onPress={() => console.log()}
+                            onPress={() =>searchByStatusFn("Urgent,Partiel")}
                             style={styles.gridButtonContainer}
                         >
-                            <View style={[styles.gridButton, { backgroundColor: "#CA278C" }]}>
+                            <View style={[styles.gridButton, { backgroundColor: StatusColors.UrgentPartielle }]}>
                                 <Text style={styles.gridLabel}>Urgent Partielle</Text>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity
                             key={"3"}
-                            onPress={() => console.log()}
+                            onPress={() => searchByStatusFn("Normal,Partiel")}
                             style={styles.gridButtonContainer}
                         >
-                            <View style={[styles.gridButton, { backgroundColor: "#ff9966" }]}>
+                            <View style={[styles.gridButton, { backgroundColor: StatusColors.NormalPartielle }]}>
                                 <Text style={styles.gridLabel}>Normal Partielle</Text>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity
                             key={"4"}
-                            onPress={() => console.log()}
+                            onPress={() => searchByStatusFn("Retarder")}
                             style={styles.gridButtonContainer}
                         >
-                            <View style={[styles.gridButton, { backgroundColor: "#E47297" }]}>
+                            <View style={[styles.gridButton, { backgroundColor: StatusColors.Retard }]}>
                                 <Text style={styles.gridLabel}>Retarder </Text>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity
                             key={"5"}
-                            onPress={() => console.log()}
+                            onPress={() => searchByStatusFn("Annuler")}
                             style={styles.gridButtonContainer}
                         >
-                            <View style={[styles.gridButton, { backgroundColor: "#cc3300" }]}>
+                            <View style={[styles.gridButton, { backgroundColor: StatusColors.Annuler  }]}>
                                 <Text style={styles.gridLabel}>Annuler </Text>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity
                             key={"6"}
-                            onPress={() => console.log()}
+                            onPress={() => searchByStatusFn("StopperP")}
                             style={styles.gridButtonContainer}
                         >
-                            <View style={[styles.gridButton, { backgroundColor: "#AA0114" }]}>
+                            <View style={[styles.gridButton, { backgroundColor: StatusColors.StoppeP }]}>
                                 <Text style={styles.gridLabel}>Stopper prod </Text>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity
                             key={"7"}
-                            onPress={() => console.log()}
+                            onPress={() => searchByStatusFn("StopperQ")}
                             style={styles.gridButtonContainer}
                         >
-                            <View style={[styles.gridButton, { backgroundColor: "#f7514b" }]}>
+                            <View style={[styles.gridButton, { backgroundColor: StatusColors.StoppeQ }]}>
                                 <Text style={styles.gridLabel}>Stopper Qual </Text>
                             </View>
                         </TouchableOpacity>
@@ -393,59 +454,26 @@ const Index = props => {
                     placeholder="Search"
                     containerStyle={styles.textInput}
                     cancelButton={false}
-                    value={text}
-                    onChangeText={() => console.log("")}
+                    value={searchUserText}
+                    onChangeText={(val) => onChangeSearchUserText(val)}
                 // theme={theme.textInput}
                 />
                 <ScrollView>
-                    <TouchableOpacity
-                        key="account"
-                        style={styles.listUsers}
-                        onPress={() => {
+                    {users && users.map((item) => (
+                        <TouchableOpacity
+                            key="account"
+                            style={styles.listUsers}
+                            onPress={() =>searchByUserFn(item.userName)}
+                        >
+                            <Icon name="account"
+                                size={50}
+                                type="material-community" style={styles.listUsersIcons} />
+                            <Text style={styles.listLabelUsers}>{item.userName}</Text>
+                        </TouchableOpacity>
 
-                        }}
-                    >
-                        <Icon name="account"
-                            size={50}
-                            type="material-community" style={styles.listUsersIcons} />
-                        <Text style={styles.listLabelUsers}>Dakhloaui moataz</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        key="account"
-                        style={styles.listUsers}
-                        onPress={() => {
 
-                        }}
-                    >
-                        <Icon name="account"
-                            size={50}
-                            type="material-community" style={styles.listUsersIcons} />
-                        <Text style={styles.listLabelUsers}>Dakhloaui moataz</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        key="account"
-                        style={styles.listUsers}
-                        onPress={() => {
+                    ))}
 
-                        }}
-                    >
-                        <Icon name="account"
-                            size={50}
-                            type="material-community" style={styles.listUsersIcons} />
-                        <Text style={styles.listLabelUsers}>Dakhloaui moataz</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        key="account"
-                        style={styles.listUsers}
-                        onPress={() => {
-
-                        }}
-                    >
-                        <Icon name="account"
-                            size={50}
-                            type="material-community" style={styles.listUsersIcons} />
-                        <Text style={styles.listLabelUsers}>Dakhloaui moataz</Text>
-                    </TouchableOpacity>
                 </ScrollView>
             </RBSheet>
         </View>
