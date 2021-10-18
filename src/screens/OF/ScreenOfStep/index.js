@@ -35,9 +35,9 @@ const index = (props) => {
       case TypeScreens.IN_Magasin_fils: return 'Out_Magasin_fils';
       case TypeScreens.Out_Magasin_fils: return 'IN_Preparation';
       case TypeScreens.IN_Preparation: return 'OUT_Preparation';
-      case TypeScreens.OUT_Preparation: return 'IN_UTRA_SON';
+      case TypeScreens.OUT_Preparation: return 'IN_Assemblage';
       case TypeScreens.IN_UTRA_SON: return 'OUT_ULTRA_SON';
-      case TypeScreens.OUT_ULTRA_SON: return 'IN_Assemblage';
+      case TypeScreens.OUT_ULTRA_SON: return 'OUT_ULTRA_SON_Confirmed';
       case TypeScreens.IN_Assemblage: return 'Out_Assemblage';
       case TypeScreens.Out_Assemblage: return 'produitFini';
       default: return '';
@@ -94,6 +94,10 @@ const index = (props) => {
         titreOfScreen: TitreOfScreens.ScreenOUT_ULTRA_SON,
         TypeOfScreen: TypeScreens.OUT_ULTRA_SON,
       };
+      case TypeScreens.OUT_ULTRA_SON_Confirmed: return {
+        titreOfScreen: TitreOfScreens.ScreenOUT_ULTRA_SONConfirmed,
+        TypeOfScreen: TypeScreens.OUT_ULTRA_SON_Confirmed,
+      };
       case TypeScreens.IN_Assemblage: return {
         titreOfScreen: TitreOfScreens.ScreenIN_Assemblage,
         TypeOfScreen: TypeScreens.IN_Assemblage,
@@ -112,7 +116,6 @@ const index = (props) => {
       updateStateOf(userToken, {
         etat: nextEtatOf(item.trackOf.etat),
         idOf: item.trackOf.idOf,
-        statusOf: (isOn).toString(),
         QtProduire: Number(qty),
         Commentaire: cmntr ? cmntr : ''
       }).then((resp) => {
@@ -173,15 +176,7 @@ const index = (props) => {
               onChangeText={setCmntr}
               secondary
             />
-            {item.trackOf.etat === 'Magasin' && <ToggleSwitch
-              isOn={isOn}
-              onColor="green"
-              offColor="red"
-              label="OF OK ?"
-              labelStyle={{ color: 'black', fontWeight: '900' }}
-              size="large"
-              onToggle={isOn => setIsOn(isOn)}
-            />}
+           
             <Button
               title={'Enregistrer'}
               containerStyle={styles.button}

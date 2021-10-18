@@ -16,7 +16,8 @@ import RBSheet from 'react-native-raw-bottom-sheet';
 import SearchBar from '@nghinv/react-native-search-bar';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { getDateCustomApi } from '../../../utils/time';
-import { StatusColors } from '../../../configs/colors';
+import { gray5, green, StatusColors } from '../../../configs/colors';
+import Toggle from 'react-native-toggle-element';
 const Index = props => {
     const { route } = props;
     const navigation = useNavigation();
@@ -44,6 +45,7 @@ const Index = props => {
             case TypeScreens.OUT_Preparation: return 'OUT_Preparation';
             case TypeScreens.IN_UTRA_SON: return 'IN_UTRA_SON';
             case TypeScreens.OUT_ULTRA_SON: return 'OUT_ULTRA_SON';
+            case TypeScreens.OUT_ULTRA_SON_Confirmed: return 'OUT_ULTRA_SON_Confirmed';
             case TypeScreens.IN_Assemblage: return 'IN_Assemblage';
             case TypeScreens.Out_Assemblage: return 'Out_Assemblage';
             default: return '';
@@ -54,7 +56,7 @@ const Index = props => {
     const [timer, setTimer] = useState(null);
     const [users, setUsers] = useState([]);
     const [currenDate, setCurrentDate] = useState(new Date());
-
+    const [modeOfSearch, setModeOfSearch] = useState(true);
     LocaleConfig.locales.fr = {
         monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
         monthNamesShort: ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'],
@@ -77,13 +79,35 @@ const Index = props => {
         setTimer(
             setTimeout(() => {
                 let x = etatOf();
+
                 setVisible(true);
-                GetOfTracksByOfName(userToken, change, x, null).then((result) => {
-                    setOfList(result);
-                    setVisible(false);
-                }).catch((err) => {
-                    console.log(err);
-                });
+                if (change && change.length > 0) {
+                    if (modeOfSearch) {
+                        GetOfTracksByOfName(userToken, change, null, x, null).then((result) => {
+                            setOfList(result);
+                            setVisible(false);
+                        }).catch((err) => {
+                            console.log(err);
+                        });
+                    } else {
+                        GetOfTracksByOfName(userToken, null, change, x, null).then((result) => {
+                            setOfList(result);
+                            setVisible(false);
+                        }).catch((err) => {
+                            console.log(err);
+                        });
+                    }
+                } else {
+
+                    getOfsByEtat(userToken, x).then((result) => {
+                        setOfList(result);
+                        setVisible(false);
+                    }).catch((err) => {
+                        console.log(err);
+                    });
+                }
+
+
             }, valueOfCounter)
         );
     }
@@ -148,7 +172,7 @@ const Index = props => {
         });
 
     }
-    
+
     useEffect(() => {
         let x = etatOf();
         setVisible(true);
@@ -203,14 +227,37 @@ const Index = props => {
                 overlayColor="rgba(255,255,255,0.75)"
                 animationStyle={styles.lottie}
                 speed={1} />
-            <SearchBar
-                placeholder="Rechercher par N° Of"
-                containerStyle={styles.textInput}
-                cancelButton={false}
-                value={text}
-                onChangeText={(val) => onChangeText(val)}
-            // theme={theme.textInput}
-            />
+            <View style={styles.searchSection}>
+                <SearchBar
+                    placeholder={modeOfSearch ? 'Rechercher par Nom OF' : 'Rechercher par N° source'}
+                    containerStyle={styles.textInput}
+                    cancelButton={false}
+                    value={text}
+                    onChangeText={(val) => onChangeText(val)}
+                // theme={theme.textInput}
+                />
+                <View style={styles.searchIcon}>
+                    <Toggle
+                        value={modeOfSearch}
+                        onPress={(newState) => setModeOfSearch(newState)}
+                        thumbButton={{
+                            inActiveBackgroundColor: gray5,
+                            activeBackgroundColor: '#fff',
+                            width: 30,
+                            height: 30,
+                            radius: 30,
+                        }}
+                        trackBar={{
+                            inactiveBackgroundColor: gray5,
+                            activeBackgroundColor: green,
+                            width: 50,
+                            height: 10,
+                            radius: 25,
+                        }}
+                    />
+                </View>
+            </View>
+
             {!visible && <FlatList
                 style={styles.tasks}
                 // columnWrapperStyle={styles.listContainer}
@@ -234,10 +281,18 @@ const Index = props => {
 
                     return (
 
-                        <TouchableOpacity style={[styles.card, { borderColor: borderColor }]} onPress={() => navigation.navigate('validationOf', { item: item })}>
+                        <TouchableOpacity style={[styles.card, { borderColor: borderColor }]}
+                            onPress={() => {  navigation.navigate('validationOf', { item: item }) }}>
                             <View style={styles.cardContent}>
                                 {/*<Text style={[styles.description, getDescriptionStyle(item)]}>{item.description}</Text>*/}
-                                <Text style={[styles.titre]}>{item.trackOf.noOf}</Text>
+                                <View style={{
+                                    flex: 1,
+                                    justifyContent: 'space-between',
+                                    flexDirection: 'row',
+                                }}>
+                                    <Text style={[styles.titre]}>{item.trackOf.noOf}</Text>
+                                    <Text style={[styles.titreSourceN]}>{item.ofDto.sourceNo}</Text>
+                                </View>
                                 <Text style={[styles.description]}>{'actionneur : ' + item.trackOf.actionneur}</Text>
                                 <View style={{
                                     flex: 1,
@@ -379,7 +434,7 @@ const Index = props => {
                         </TouchableOpacity>
                         <TouchableOpacity
                             key={"2"}
-                            onPress={() =>searchByStatusFn("Urgent,Partiel")}
+                            onPress={() => searchByStatusFn("Urgent,Partiel")}
                             style={styles.gridButtonContainer}
                         >
                             <View style={[styles.gridButton, { backgroundColor: StatusColors.UrgentPartielle }]}>
@@ -409,7 +464,7 @@ const Index = props => {
                             onPress={() => searchByStatusFn("Annuler")}
                             style={styles.gridButtonContainer}
                         >
-                            <View style={[styles.gridButton, { backgroundColor: StatusColors.Annuler  }]}>
+                            <View style={[styles.gridButton, { backgroundColor: StatusColors.Annuler }]}>
                                 <Text style={styles.gridLabel}>Annuler </Text>
                             </View>
                         </TouchableOpacity>
@@ -463,7 +518,7 @@ const Index = props => {
                         <TouchableOpacity
                             key="account"
                             style={styles.listUsers}
-                            onPress={() =>searchByUserFn(item.userName)}
+                            onPress={() => searchByUserFn(item.userName)}
                         >
                             <Icon name="account"
                                 size={50}
@@ -547,6 +602,11 @@ const styles = StyleSheet.create({
         color: '#008080',
         fontWeight: 'bold',
     },
+    titreSourceN: {
+        fontSize: 18,
+        color: '#008080',
+        fontWeight: 'bold',
+    },
     description: {
         marginTop: 5,
         fontSize: 12,
@@ -560,6 +620,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     textInput: {
+        flex: 1,
         marginTop: 10,
         paddingHorizontal: 16,
         paddingVertical: 8,
@@ -567,6 +628,15 @@ const styles = StyleSheet.create({
     date: {
         fontSize: 14,
         color: '#696969',
+    },
+    searchSection: {
+        // flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'center',
+    },
+    searchIcon: {
+        marginTop: 30,
+        marginRight: 10,
     },
     listContainer: {
         // flex: 1,

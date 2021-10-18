@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from 'src/utils/auth-context';
 import { TitreOfScreens, TypeScreens } from '../../configs/typeOfScreens';
 import { getCountOfByEtat } from '../../services/of-services';
+import { useIsFocused } from '@react-navigation/native';
 const Index = () => {
   const navigation = useNavigation();
   const { user, signOut, userToken } = React.useContext(AuthContext);
@@ -34,15 +35,15 @@ const Index = () => {
       { id: 14, title: 'Of Out Preparation', color: '#008080', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
       { id: 15, title: 'Of In SODURE UTRA-SON', color: '#87CEEB', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
       { id: 16, title: 'Of Out SODURE UTRA-SON', color: '#87CEEB', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 17, title: 'Of In Assemblage', color: '#FF69B4', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 18, title: 'Of Out Assemblage', color: '#FF69B4', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 17, title: 'Of In Assemblage', color: '#FF9966', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 18, title: 'Of Out Assemblage', color: '#FF9966', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 20, title: 'Of Confirmation SODURE UTRA-SON', color: '#87CEEB', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
   
     ];
-    let i = 0;
+ 
     getCountOfByEtat(userToken).then((resp) => {
       resp.map((item) => {
-
-        switch (item.statu) {
+        switch (item.statu.trim()) {
           case 'OfLancer': menu.find(p => p.id === 3).members = item.nomber; break;
           case 'OfByStatus': menu.find(p => p.id === 4).members = item.nomber; break;
           case 'Magasin': menu.find(p => p.id === 5).members = item.nomber; break;
@@ -59,11 +60,12 @@ const Index = () => {
           case 'OUT_ULTRA_SON':menu.find(p => p.id === 16).members = item.nomber; break;
           case 'IN_Assemblage': menu.find(p => p.id === 17).members = item.nomber; break;
           case 'Out_Assemblage': menu.find(p => p.id === 18).members = item.nomber; break;
+          case 'OUT_ULTRA_SON_Confirmed': menu.find(p => p.id === 20).members = item.nomber; break;
         }
       });
       setMenuAdmin(menu); 
     });
-  }, []);
+  }, [useIsFocused()]);
   //console.log(user)
   const clickEventListener = item => {
     switch (item) {
@@ -178,6 +180,13 @@ const Index = () => {
           {
             titreOfScreen: TitreOfScreens.ScreenOut_Assemblage,
             TypeOfScreen: TypeScreens.Out_Assemblage,
+          });
+        break;
+      case 'Of Confirmation SODURE UTRA-SON':
+        navigation.navigate('sahredOfScreen',
+          {
+            titreOfScreen: TitreOfScreens.ScreenOUT_ULTRA_SONConfirmed,
+            TypeOfScreen: TypeScreens.OUT_ULTRA_SON_Confirmed,
           });
         break;
       default:

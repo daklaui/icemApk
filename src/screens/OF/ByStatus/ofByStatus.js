@@ -56,17 +56,39 @@ const OfsByStatus = props => {
       };*/
     const changeStateOf = (item) => {
         Alert.alert(
+
             "Confirmation",
             "Envoyer l'of en fil d'attente de coupe",
             [
                 {
-                    text: "Cancel",
-                    onPress: () => console.log("Cancel Pressed"),
+                    text: "No OK",
+                    onPress: () => {
+                        console.log('test')
+                        updateStateOf(userToken, {
+                            etat: "Magasin",
+                            idOf: item.trackOf.idOf,
+                            statusOf: "false"
+                        }).then((resp) => {
+                            console.log(resp)
+                            SweetAlert.showAlertWithOptions({
+                                title: '',
+                                subTitle: 'enregistrement a été effectué avec succès.',
+                                confirmButtonTitle: 'OK',
+                                confirmButtonColor: '#000',
+                                otherButtonTitle: 'Cancel',
+                                otherButtonColor: '#dedede',
+                                style: 'success',
+                                cancellable: true
+                            },
+                                callback => console.log('callback'));
+                            setIsStateChanged(!stateChanged)
+                        })
+                    },
                     style: "cancel"
                 },
                 {
                     text: "OK", onPress: () => {
-                        updateStateOf(userToken, { etat: "Magasin", idOf: item.trackOf.idOf }).then((resp) => {
+                        updateStateOf(userToken, { etat: "Magasin", idOf: item.trackOf.idOf, statusOf: "true" }).then((resp) => {
                             SweetAlert.showAlertWithOptions({
                                 title: '',
                                 subTitle: 'enregistrement a été effectué avec succès.',
@@ -83,7 +105,10 @@ const OfsByStatus = props => {
 
                     }
                 }
-            ]
+            ],
+            {
+                cancelable: true,
+            }
         );
     }
     return (
@@ -108,7 +133,14 @@ const OfsByStatus = props => {
                         <TouchableOpacity style={[styles.card, { borderColor: borderColor }]} onPress={() => changeStateOf(item)}>
                             <View style={styles.cardContent}>
                                 {/*<Text style={[styles.description, getDescriptionStyle(item)]}>{item.description}</Text>*/}
-                                <Text style={[styles.titre]}>{item.trackOf.noOf}</Text>
+                                <View style={{
+                                            flex: 1,
+                                            justifyContent: 'space-between',
+                                            flexDirection: 'row',
+                                        }}>
+                                            <Text style={[styles.titre]}>{item.trackOf.noOf}</Text>
+                                            <Text style={[styles.titreSourceN]}>{item.ofDto.sourceNo}</Text>
+                                        </View>
                                 <Text style={[styles.description]}>{'actionneur : ' + item.trackOf.actionneur}</Text>
                                 <View style={{
                                     flex: 1,
@@ -166,6 +198,11 @@ const styles = StyleSheet.create({
     titre: {
         fontSize: 18,
         flex: 1,
+        color: '#008080',
+        fontWeight: 'bold',
+    },
+    titreSourceN: {
+        fontSize: 18,
         color: '#008080',
         fontWeight: 'bold',
     },
