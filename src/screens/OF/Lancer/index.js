@@ -6,22 +6,25 @@ import Icon from 'src/components/Icon';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from 'src/utils/auth-context';
 import Text from 'src/components/Text';
-import Swipeout from 'react-native-swipeout';
 import * as themeColors from 'src/configs/themes';
 import { getAllOfs } from 'src/services/of-services';
-import { colors } from 'react-native-elements';
+import Button from 'src/components/Button';
 import { getDateCustom } from 'src/utils/time';
-import { addNewOfATracker, FilterOfs } from '../../../services/of-services';
+import { addNewOfATracker, FilterOfs, addNewOfATrackerList } from '../../../services/of-services';
 import SweetAlert from 'react-native-sweet-alert';
 import AnimatedLoader from 'react-native-animated-loader';
 import SearchBar from '@nghinv/react-native-search-bar';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import Toggle from 'react-native-toggle-element';
-import { gray5, green } from '../../../configs/colors';
+import { black, gray5, green, red } from '../../../configs/colors';
 import { Calendar } from 'react-native-calendars';
 import { getDateCustomApi } from '../../../utils/time';
-const index = () => {
+import { ActivityIndicator } from 'react-native';
+import { colors } from 'react-native-elements';
+const index = (props) => {
+    const { route } = props;
     const [visible, setVisible] = useState(true);
+    const [loadingMore, setLoadingMoare] = useState(false);
     const navigation = useNavigation();
     const { user, signOut, userToken } = React.useContext(AuthContext);
     const [ofList, setOfList] = useState([]);
@@ -30,7 +33,9 @@ const index = () => {
     const [timer, setTimer] = useState(null);
     const { colors } = themeColors.themeLight;
     const [currenDate, setCurrentDate] = useState(new Date());
+    const [selectedItems, setSelectedItems] = useState([]);
     const typeOfSearch = useRef(null);
+
     useEffect(() => {
         getAllOfs(userToken).then((result) => {
             //   console.log(result);
@@ -41,26 +46,11 @@ const index = () => {
         });
 
     }, []);
-
-
-
     const clickEventListener = (item) => {
-        Alert.alert(item.description);
-    };
-
-    const getCompletedIcon = (item) => {
-        return 'https://img.icons8.com/flat_round/64/000000/checkmark.png';
-        /*  if (item.completed == 1) {
-            return 'https://img.icons8.com/flat_round/64/000000/checkmark.png';
-          } else {
-            return 'https://img.icons8.com/flat_round/64/000000/delete-sign.png';
-          }*/
-    };
-
-    const getDescriptionStyle = (item) => {
-        if (item.completed == 1) {
-            return { textDecorationLine: 'line-through', fontStyle: 'italic', color: '#808080' };
+        if (selectedItems.length > 0) {
+            return onLongPressHandel(item);
         }
+        Alert.alert(item.description);
     };
     const addOf = (of) => {
         addNewOfATracker(userToken, of).then((result) => {
@@ -111,7 +101,6 @@ const index = () => {
         displayResult(value);
     };
 
-
     const getOfsBySearchText = (name, noSource, date) => {
         setVisible(true);
         FilterOfs(userToken, name, noSource, date).then((data) => {
@@ -154,11 +143,54 @@ const index = () => {
             }, valueOfCounter)
         );
     }
+    const addSelectedItems = (type) => {
+        let sendArry = [];
+        ofList.forEach((item) => {
+            if (selectedItems.includes(item.no)){
+                sendArry.push({QtProduire: item.quantity, NoOf: item.no, statusOf: type, etat: 'enAttenteDePlanification' });
+            }
+        });
+        console.log(sendArry);
+        addNewOfATrackerList(userToken, sendArry).then((result) => {
+            console.log(result)
+            SweetAlert.showAlertWithOptions({
+                title: '',
+                subTitle: 'enregistrement a été effectué avec succès.',
+                confirmButtonTitle: 'OK',
+                confirmButtonColor: '#000',
+                otherButtonTitle: 'Cancel',
+                otherButtonColor: '#dedede',
+                style: 'success',
+                cancellable: true,
+            },
+                callback => console.log('callback'));
+            setOfList([]);
+            setOfList(result);
+        }).catch((err) => {
+            console.log(err);
+        });
+    };
+
     const serachByDay = (value) => {
         setVisible(true);
         getOfsBySearchText(null, null, getDateCustomApi(new Date(value.dateString)));
-    }
-
+    };
+    const onLongPressHandel = (item) => {
+        if (selectedItems.includes(item.no)) {
+            const newList = selectedItems.filter((no) => no !== item.no);
+            console.log(newList);
+            return setSelectedItems([...newList]);
+        }
+        setSelectedItems([...selectedItems, item.no]);
+    };
+    const isItemSelected = (ofNum) => {
+        return selectedItems.includes(ofNum);
+    };
+    const selectAll = () => {
+        let arr = [];
+        ofList.map((item) => arr.push(item.no));
+        setSelectedItems(arr);
+    };
     return (
         <View style={styles.container}>
             <Header
@@ -221,7 +253,27 @@ const index = () => {
                     />
                 </View>
             </View>
-
+            {selectedItems.length > 0 && <View style={styles.buttonSection}>
+                <Button
+                    onPress={() => addSelectedItems('Urgent')}
+                    title="Urgent"
+                    buttonStyle={{ backgroundColor: red }}
+                />
+                <Button
+                    onPress={() =>  addSelectedItems('Normal')}
+                    buttonStyle={{ backgroundColor: black }}
+                    title="Normal"
+                />
+                <Button
+                    onPress={() => selectAll()}
+                    title="Select all"
+                />
+                <Button
+                    onPress={() => { setSelectedItems([]); }}
+                    title="Deselect All"
+                />
+            </View>
+            }
             {
                 !visible && <FlatList
                     style={styles.tasks}
@@ -230,39 +282,44 @@ const index = () => {
                     keyExtractor={(item) => {
                         return item.id;
                     }}
+                    initialNumToRender={10}
+
                     renderItem={({ item }) => {
                         return (
-                            <Swipeout style={{ backgroundColor: colors.background }} right={swipeoutBtns(item)}>
-                                <TouchableOpacity style={[styles.card, { borderColor: item.color }]} onPress={() => { clickEventListener(item); }}>
-                                    <View style={styles.cardContent}>
-                                        {/*<Text style={[styles.description, getDescriptionStyle(item)]}>{item.description}</Text>*/}
-                                        <View style={{
-                                            flex: 1,
-                                            justifyContent: 'space-between',
-                                            flexDirection: 'row',
-                                        }}>
-                                            <Text style={[styles.titre]}>{item.no}</Text>
-                                            <Text style={[styles.titreSourceN]}>{item.sourceNo}</Text>
-                                        </View>
+                            <TouchableOpacity key={item.no} style={[styles.card, { borderColor: item.color }]} onLongPress={() => onLongPressHandel(item)} onPress={() => { clickEventListener(item); }}>
+                                <View style={styles.cardContent}>
+                                    {/*<Text style={[styles.description, getDescriptionStyle(item)]}>{item.description}</Text>*/}
+                                    <View style={{
+                                        flex: 1,
+                                        justifyContent: 'space-between',
+                                        flexDirection: 'row',
+                                    }}>
+                                        <Text style={[styles.titre]}>{item.no}</Text>
+                                        <Text style={[styles.titreSourceN]}>{item.sourceNo}</Text>
+                                    </View>
 
-                                        <Text style={[styles.description]}>{item.description}</Text>
-                                        <View style={{
-                                            flex: 1,
-                                            alignItems: 'center', // ignore this - we'll come back to it
-                                            justifyContent: 'space-between',
-                                            flexDirection: 'row',
-                                            marginTop: 6,
-                                        }}>
-                                            <Text style={styles.date}>{getDateCustom(item.date_creation_of)}</Text>
-                                            <Text style={styles.quantite}>{'Quantité : ' + item.quantity}</Text>
-
-                                        </View>
+                                    <Text style={[styles.description]}>{item.description}</Text>
+                                    <View style={{
+                                        flex: 1,
+                                        alignItems: 'center', // ignore this - we'll come back to it
+                                        justifyContent: 'space-between',
+                                        flexDirection: 'row',
+                                        marginTop: 6,
+                                    }}>
+                                        <Text style={styles.date}>{getDateCustom(item.date_creation_of)}</Text>
+                                        <Text style={styles.quantite}>{'Quantité : ' + item.quantity}</Text>
 
                                     </View>
-                                </TouchableOpacity>
-                            </Swipeout>
+
+                                </View>
+                                {isItemSelected(item.no) && <View style={styles.overlay} />}
+                            </TouchableOpacity>
+
                         );
-                    }} />
+                    }}
+                    ListFooterComponent={() => loadingMore && <View style={{ margin: '10%' }}><ActivityIndicator /></View>}
+
+                />
             }
             <RBSheet
                 ref={typeOfSearch}
@@ -303,6 +360,7 @@ const styles = StyleSheet.create({
     cardContent: {
         marginLeft: 10,
         marginTop: 10,
+        padding: 10,
     },
     image: {
         width: 25,
@@ -320,9 +378,8 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         marginHorizontal: 20,
         backgroundColor: 'white',
-
-        padding: 10,
-
+        overflow: 'hidden',
+        borderRadius: 5,
         borderLeftWidth: 6,
     },
     textInput: {
@@ -364,6 +421,11 @@ const styles = StyleSheet.create({
         // flex: 1,
         flexDirection: 'row',
         justifyContent: 'center',
+    },
+    buttonSection: {
+        paddingHorizontal: '5%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
     searchIcon: {
         marginTop: 20,
@@ -407,6 +469,14 @@ const styles = StyleSheet.create({
     listLabelUsers: {
         fontWeight: 'bold',
         fontSize: 18,
+    },
+    overlay: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        left: 0,
+        top: 0,
     },
 });
 export default index;

@@ -7,7 +7,7 @@ import Icon from 'src/components/Icon';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from 'src/utils/auth-context';
 import { TitreOfScreens, TypeScreens } from '../../configs/typeOfScreens';
-import { getCountOfByEtat } from '../../services/of-services';
+import { getAllOfs, getCountOfByEtat } from '../../services/of-services';
 import { useIsFocused } from '@react-navigation/native';
 const Index = () => {
   const navigation = useNavigation();
@@ -77,6 +77,7 @@ const Index = () => {
         break;
       case 'Of Lancer':
         navigation.navigate('OfLancer');
+
         break;
       case 'Of Par Status':
         navigation.navigate('OfUrgent');
