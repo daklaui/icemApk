@@ -13,15 +13,16 @@ import { getDateCustom } from 'src/utils/time';
 import { addNewOfATracker, FilterOfs, addNewOfATrackerList } from '../../../services/of-services';
 import SweetAlert from 'react-native-sweet-alert';
 import AnimatedLoader from 'react-native-animated-loader';
-import SearchBar from '@nghinv/react-native-search-bar';
 import RBSheet from 'react-native-raw-bottom-sheet';
-import Toggle from 'react-native-toggle-element';
-import { black, gray5, green, red } from '../../../configs/colors';
+import { black, red } from '../../../configs/colors';
 import { Calendar } from 'react-native-calendars';
 import { getDateCustomApi } from '../../../utils/time';
 import { ActivityIndicator } from 'react-native';
 import { colors } from 'react-native-elements';
 import Swipeout from 'react-native-swipeout';
+import { HeaderSearch } from '../../../components/HeaderSearch';
+import CardOf from '../../../components/CardOf';
+import Calander from '../../../components/Calander';
 const index = (props) => {
     const { route } = props;
     const [visible, setVisible] = useState(true);
@@ -113,6 +114,7 @@ const index = (props) => {
             console.log(error);
             date && typeOfSearch.current.close();
         });
+        setSelectedItems([]);
     };
 
     function displayResult(value) {
@@ -223,36 +225,9 @@ const index = (props) => {
                 overlayColor="rgba(255,255,255,0.75)"
                 animationStyle={styles.lottie}
                 speed={1} />
-            <View style={styles.searchSection}>
-                <SearchBar
-                    placeholder={modeOfSearch ? 'Rechercher par Nom OF' : 'Rechercher par N° source'}
-                    containerStyle={styles.textInput}
-                    cancelButton={false}
-                    value={searchText}
-                    onChangeText={(val) => onChangeSearchText(val)}
-                // theme={theme.textInput}
-                />
-                <View style={styles.searchIcon}>
-                    <Toggle
-                        value={modeOfSearch}
-                        onPress={(newState) => setModeOfSearch(newState)}
-                        thumbButton={{
-                            inActiveBackgroundColor: gray5,
-                            activeBackgroundColor: '#fff',
-                            width: 30,
-                            height: 30,
-                            radius: 30,
-                        }}
-                        trackBar={{
-                            inactiveBackgroundColor: gray5,
-                            activeBackgroundColor: green,
-                            width: 50,
-                            height: 10,
-                            radius: 25,
-                        }}
-                    />
-                </View>
-            </View>
+
+            <HeaderSearch onChangeText={(val) => onChangeSearchText(val)} setModeOfSearch={(mode) => setModeOfSearch(mode)} />
+
             {selectedItems.length > 0 && <View style={styles.buttonSection}>
                 <Button
                     onPress={() => addSelectedItems('Urgent')}
@@ -277,42 +252,22 @@ const index = (props) => {
             {
                 !visible && <FlatList
                     style={styles.tasks}
-                    //  columnWrapperStyle={styles.listContainer}
                     data={ofList}
                     keyExtractor={(item) => {
                         return item.id;
                     }}
                     initialNumToRender={10}
                     renderItem={({ item }) => {
+                        const itemList = {
+                            no: item.no,
+                            sourceNo: item.sourceNo,
+                            description: item.description,
+                            dateActon: item.date_creation_of,
+                            quantity: item.quantity
+                        }
                         return (
                             <Swipeout key={`of${item.no}`} style={{ backgroundColor: colors.background }} right={swipeoutBtns(item)}>
-                                <TouchableOpacity key={item.no} style={[styles.card, { borderColor: item.color }]} onLongPress={() => onLongPressHandel(item)} onPress={() => { clickEventListener(item); }}>
-                                    <View style={styles.cardContent}>
-                                        <View style={{
-                                            flex: 1,
-                                            justifyContent: 'space-between',
-                                            flexDirection: 'row',
-                                        }}>
-                                            <Text style={[styles.titre]}>{item.no}</Text>
-                                            <Text style={[styles.titreSourceN]}>{item.sourceNo}</Text>
-                                        </View>
-
-                                        <Text style={[styles.description]}>{item.description}</Text>
-                                        <View style={{
-                                            flex: 1,
-                                            alignItems: 'center', // ignore this - we'll come back to it
-                                            justifyContent: 'space-between',
-                                            flexDirection: 'row',
-                                            marginTop: 6,
-                                        }}>
-                                            <Text style={styles.date}>{getDateCustom(item.date_creation_of)}</Text>
-                                            <Text style={styles.quantite}>{'Quantité : ' + item.quantity}</Text>
-
-                                        </View>
-
-                                    </View>
-                                    {isItemSelected(item.no) && <View style={styles.overlay} />}
-                                </TouchableOpacity>
+                                <CardOf item={itemList} onChangeScreen={(item) => clickEventListener(item)} selectedItem={(no) => isItemSelected(no)} longPressHandled={(item) => onLongPressHandel(item)} />
                             </Swipeout>
 
                         );
@@ -321,27 +276,7 @@ const index = (props) => {
 
                 />
             }
-            <RBSheet
-                ref={typeOfSearch}
-                animationType="fade"
-                height={500}
-                closeOnDragDown={true}
-                closeOnPressMask={false}
-                customStyles={{
-                    wrapper: {
-                        backgroundColor: '#000000CC',
-                    },
-                    draggableIcon: {
-                        backgroundColor: '#000',
-                    },
-                }}
-            >
-                <Calendar
-                    current={currenDate}
-                    onDayPress={(day) => serachByDay(day)}
-                    enableSwipeMonths={true}
-                />
-            </RBSheet>
+            <Calander refCalander={typeOfSearch} serachByDay={(day) => serachByDay(day)} />
         </View>
 
     );
@@ -423,6 +358,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     buttonSection: {
+        marginVertical: '5%',
         paddingHorizontal: '5%',
         flexDirection: 'row',
         justifyContent: 'space-between',

@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, {useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { AuthContext } from 'src/utils/auth-context';
@@ -17,6 +17,9 @@ import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { getDateCustomApi } from '../../../utils/time';
 import { gray5, green, StatusColors } from '../../../configs/colors';
 import Toggle from 'react-native-toggle-element';
+import CardOf from '../../../components/CardOf';
+import { HeaderSearch } from '../../../components/HeaderSearch';
+import Calander from '../../../components/Calander';
 const Index = props => {
     const { route } = props;
     const navigation = useNavigation();
@@ -189,6 +192,13 @@ const Index = props => {
         };
     }, [useIsFocused()]);
 
+    const onChangeScreen = (item) => {
+        GetHistoriqueOf(userToken, item.trackOf.noOf).then((result) => {
+            navigation.navigate('validationOf', { item: item, ListCommantaires: result })
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
     return (
         <View style={styles.container}>
             <Header
@@ -222,95 +232,14 @@ const Index = props => {
                 overlayColor="rgba(255,255,255,0.75)"
                 animationStyle={styles.lottie}
                 speed={1} />
-            <View style={styles.searchSection}>
-                <SearchBar
-                    placeholder={modeOfSearch ? 'Rechercher par Nom OF' : 'Rechercher par N° source'}
-                    containerStyle={styles.textInput}
-                    cancelButton={false}
-                    value={text}
-                    onChangeText={(val) => onChangeText(val)}
-                // theme={theme.textInput}
-                />
-                <View style={styles.searchIcon}>
-                    <Toggle
-                        value={modeOfSearch}
-                        onPress={(newState) => setModeOfSearch(newState)}
-                        thumbButton={{
-                            inActiveBackgroundColor: gray5,
-                            activeBackgroundColor: '#fff',
-                            width: 30,
-                            height: 30,
-                            radius: 30,
-                        }}
-                        trackBar={{
-                            inactiveBackgroundColor: gray5,
-                            activeBackgroundColor: green,
-                            width: 50,
-                            height: 10,
-                            radius: 25,
-                        }}
-                    />
-                </View>
-            </View>
-
+            <HeaderSearch onChangeText={(val) => onChangeText()} setModeOfSearch={(mode) => setModeOfSearch(mode)}/>
             {!visible && <FlatList
                 style={styles.tasks}
-                // columnWrapperStyle={styles.listContainer}
                 data={ofList}
                 keyExtractor={(item) => {
                     return item.id;
                 }}
-                renderItem={({ item }) => {
-                    let borderColor;//= item.trackOf.statusOf.includes('Urgent') ? '#FF4500' : null;
-                    switch (item.trackOf.statusOf) {
-                        case 'Urgent': borderColor = StatusColors.Urgent; break;
-                        case 'Urgent,Partiel': borderColor = StatusColors.UrgentPartielle; break;
-                        case 'Normal,Partiel': borderColor = StatusColors.NormalPartielle; break;
-                        case 'Retard': borderColor = StatusColors.Retard; break;
-                        case 'StoppeP': borderColor = StatusColors.StoppeP; break;
-                        case 'StoppeQ': borderColor = StatusColors.StoppeQ; break;
-                        case 'Annulé': borderColor = StatusColors.Annuler; break;
-                        default: borderColor = StatusColors.Normal; break;
-                    }
-
-                    const onChangeScreen = (item) => {
-                        GetHistoriqueOf(userToken, item.trackOf.noOf).then((result) => {
-                            navigation.navigate('validationOf', { item: item, ListCommantaires: result })
-                        }).catch((err) => {
-                            console.log(err);
-                        });
-                    }
-                    return (
-
-                        <TouchableOpacity key={item.trackOf.dateAction} style={[styles.card, { borderColor: borderColor }]}
-                            onPress={() => onChangeScreen(item)}>
-                            <View style={styles.cardContent}>
-                                {/*<Text style={[styles.description, getDescriptionStyle(item)]}>{item.description}</Text>*/}
-                                <View style={{
-                                    flex: 1,
-                                    justifyContent: 'space-between',
-                                    flexDirection: 'row',
-                                }}>
-                                    <Text style={[styles.titre]}>{item.trackOf.noOf}</Text>
-                                    <Text style={[styles.titreSourceN]}>{item.ofDto.sourceNo}</Text>
-                                </View>
-                                <Text style={[styles.description]}>{'actionneur : ' + item.trackOf.actionneur}</Text>
-                                <View style={{
-                                    flex: 1,
-                                    alignItems: 'center', // ignore this - we'll come back to it
-                                    justifyContent: 'space-between',
-                                    flexDirection: 'row',
-                                    marginTop: 6,
-                                }}>
-                                    <Text style={styles.date}>{getDateCustom(item.trackOf.dateAction)}</Text>
-                                    <Text style={styles.quantite}>{'Quantité : ' + item.trackOf.qtProduire}</Text>
-
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-
-                    );
-                }} />}
+                renderItem={(item) => <CardOf item={item} onChangeScreen={(item) => onChangeScreen(item)} />} />}
 
             <RBSheet
                 ref={refRBSheet}
@@ -373,27 +302,7 @@ const Index = props => {
             </RBSheet>
 
             {/*   ModalSearchByTExt  */}
-            <RBSheet
-                ref={searchByDate}
-                animationType="fade"
-                height={500}
-                closeOnDragDown={true}
-                closeOnPressMask={false}
-                customStyles={{
-                    wrapper: {
-                        backgroundColor: '#000000CC',
-                    },
-                    draggableIcon: {
-                        backgroundColor: '#000',
-                    },
-                }}
-            >
-                <Calendar
-                    current={currenDate}
-                    onDayPress={(day) => serachByDay(day)}
-                    enableSwipeMonths={true}
-                />
-            </RBSheet>
+            <Calander refCalander={searchByDate} serachByDay={(day) => serachByDay(day)}/>
             {/*   searchByStatus  */}
             <RBSheet
                 ref={searchByStatus}
