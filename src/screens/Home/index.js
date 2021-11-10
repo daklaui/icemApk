@@ -7,7 +7,7 @@ import Icon from 'src/components/Icon';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from 'src/utils/auth-context';
 import { TitreOfScreens, TypeScreens } from '../../configs/typeOfScreens';
-import { getAllOfs, getCountOfByEtat } from '../../services/of-services';
+import { getCountOfByEtat } from '../../services/of-services';
 import { useIsFocused } from '@react-navigation/native';
 const Index = () => {
   const navigation = useNavigation();
@@ -18,52 +18,58 @@ const Index = () => {
   const [menuAdmin, setMenuAdmin] = useState();
   useEffect(() => {
     let menu = [
-      { id: 1, title: 'Utilisateurs', color: '#FF4500', members: '', image: 'https://img.icons8.com/color/70/000000/groups.png' },
-      { id: 2, title: 'Ajouter Utilisateur', color: '#4682B4', members: '', image: 'https://img.icons8.com/color/70/000000/add-user-male--v1.png' },
-      { id: 19, title: 'Of Historique', color: '#FF4500', members: '', image: 'https://img.icons8.com/color/70/000000/to-do.png' },
       { id: 3, title: 'Of Lancer', color: '#191970', members: 0, image: 'https://img.icons8.com/color/70/000000/checklist.png' },
       { id: 4, title: 'Of Par Status', color: '#191970', members: 0, image: 'https://img.icons8.com/color/70/000000/checklist.png' },
-      { id: 5, title: 'Of Magasin', color: '#00BFFF', members: 5, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 6, title: 'Of Reception pour la coupe', color: '#00BFFF', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 7, title: 'Of In Coupe', color: '#4682B4', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 8, title: 'Of Out Coupe', color: '#4682B4', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 9, title: 'Of In Sertissage', color: '#6A5ACD', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 10, title: 'Of Out Sertissage', color: '#6A5ACD', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 11, title: 'Of In Magasin fils', color: '#20B2AA', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 12, title: 'Of Out Magasin fils', color: '#20B2AA', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 13, title: 'Of In Preparation', color: '#008080', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 14, title: 'Of Out Preparation', color: '#008080', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 15, title: 'Of In SODURE UTRA-SON', color: '#87CEEB', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 16, title: 'Of Out SODURE UTRA-SON', color: '#87CEEB', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 17, title: 'Of In Assemblage', color: '#FF9966', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 18, title: 'Of Out Assemblage', color: '#FF9966', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-      { id: 20, title: 'Of Confirmation SODURE UTRA-SON', color: '#87CEEB', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
-  
+      { id: 5, title: 'Of Annuler', color: '#00BFFF', members: 5, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 6, title: 'Of Historique', color: '#FF4500', members: '', image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 7, title: 'Of Reception pour la coupe', color: '#00BFFF', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 8, title: 'Of In Coupe', color: '#4682B4', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 9, title: 'Of Out Coupe', color: '#4682B4', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 10, title: 'Of In Scarmato', color: '#87CEEB', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 11, title: 'Of Out Scarmato', color: '#87CEEB', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 23, title: 'Of Confirmation Scarmato', color: '#87CEEB', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 12, title: 'Of In Sertissage', color: '#6A5ACD', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 13, title: 'Of Out Sertissage', color: '#6A5ACD', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 14, title: 'Of In Magasin fils', color: '#20B2AA', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 15, title: 'Of Out Magasin fils', color: '#20B2AA', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 16, title: 'Of In Preparation', color: '#008080', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 17, title: 'Of Out Preparation', color: '#008080', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 18, title: 'Of In SODURE UTRA-SON', color: '#87CEEB', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 19, title: 'Of Out SODURE UTRA-SON', color: '#87CEEB', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 20, title: 'Of In Assemblage', color: '#FF9966', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 21, title: 'Of Out Assemblage', color: '#FF9966', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
+      { id: 22, title: 'Of Confirmation SODURE UTRA-SON', color: '#87CEEB', members: 0, image: 'https://img.icons8.com/color/70/000000/to-do.png' },
     ];
- 
+    if (user.idRole === 'Administarteur') {
+      menu.push({ id: 1, title: 'Utilisateurs', color: '#FF4500', members: '', image: 'https://img.icons8.com/color/70/000000/groups.png' },
+        { id: 2, title: 'Ajouter Utilisateur', color: '#4682B4', members: '', image: 'https://img.icons8.com/color/70/000000/add-user-male--v1.png' });
+    }
     getCountOfByEtat(userToken).then((resp) => {
       resp.map((item) => {
         switch (item.statu.trim()) {
           case 'OfLancer': menu.find(p => p.id === 3).members = item.nomber; break;
           case 'OfByStatus': menu.find(p => p.id === 4).members = item.nomber; break;
-          case 'Magasin': menu.find(p => p.id === 5).members = item.nomber; break;
-          case 'CoupeReception': menu.find(p => p.id === 6).members = item.nomber; break;
-          case 'IN_coupe': menu.find(p => p.id === 7).members = item.nomber; break;
-          case 'Out_coupe':menu.find(p => p.id === 8).members = item.nomber; break;
-          case 'In_Sertissage': menu.find(p => p.id === 9).members = item.nomber; break;
-          case 'Out_Sertissage': menu.find(p => p.id === 10).members = item.nomber; break;
-          case 'IN_Magasin_fils': menu.find(p => p.id === 11).members = item.nomber; break;
-          case 'Out_Magasin_fils': menu.find(p => p.id === 12).members = item.nomber; break;
-          case 'IN_Preparation': menu.find(p => p.id === 13).members = item.nomber; break;
-          case 'OUT_Preparation': menu.find(p => p.id === 14).members = item.nomber; break;
-          case 'IN_UTRA_SON': menu.find(p => p.id === 15).members = item.nomber; break;
-          case 'OUT_ULTRA_SON':menu.find(p => p.id === 16).members = item.nomber; break;
-          case 'IN_Assemblage': menu.find(p => p.id === 17).members = item.nomber; break;
-          case 'Out_Assemblage': menu.find(p => p.id === 18).members = item.nomber; break;
-          case 'OUT_ULTRA_SON_Confirmed': menu.find(p => p.id === 20).members = item.nomber; break;
+          case 'Annuler': menu.find(p => p.id === 5).members = item.nomber; break;
+          case 'CoupeReception': menu.find(p => p.id === 7).members = item.nomber; break;
+          case 'IN_coupe': menu.find(p => p.id === 8).members = item.nomber; break;
+          case 'Out_coupe': menu.find(p => p.id === 9).members = item.nomber; break;
+          case 'IN_SCARMATO': menu.find(p => p.id === 10).members = item.nomber; break;
+          case 'OUT_SCARMATO': menu.find(p => p.id === 11).members = item.nomber; break;
+          case 'In_Sertissage': menu.find(p => p.id === 12).members = item.nomber; break;
+          case 'Out_Sertissage': menu.find(p => p.id === 13).members = item.nomber; break;
+          case 'IN_Magasin_fils': menu.find(p => p.id === 14).members = item.nomber; break;
+          case 'Out_Magasin_fils': menu.find(p => p.id === 15).members = item.nomber; break;
+          case 'IN_Preparation': menu.find(p => p.id === 16).members = item.nomber; break;
+          case 'OUT_Preparation': menu.find(p => p.id === 17).members = item.nomber; break;
+          case 'IN_UTRA_SON': menu.find(p => p.id === 18).members = item.nomber; break;
+          case 'OUT_ULTRA_SON': menu.find(p => p.id === 19).members = item.nomber; break;
+          case 'IN_Assemblage': menu.find(p => p.id === 20).members = item.nomber; break;
+          case 'Out_Assemblage': menu.find(p => p.id === 21).members = item.nomber; break;
+          case 'OUT_SCARMATO_Confirmed': menu.find(p => p.id === 23).members = item.nomber; break;
+
         }
       });
-      setMenuAdmin(menu); 
+      setMenuAdmin(menu);
     });
   }, [useIsFocused()]);
   //console.log(user)
@@ -85,11 +91,11 @@ const Index = () => {
       case 'Of Historique':
         navigation.navigate('historqueOf');
         break;
-      case 'Of Magasin':
+      case 'Of Annuler':
         navigation.navigate('sahredOfScreen',
           {
-            titreOfScreen: TitreOfScreens.ScreenMagasin,
-            TypeOfScreen: TypeScreens.Magasin,
+            titreOfScreen: TitreOfScreens.ScreenAnnuler,
+            TypeOfScreen: TypeScreens.Annuler,
           });
         break;
       case 'Of Reception pour la coupe':
@@ -190,6 +196,27 @@ const Index = () => {
             TypeOfScreen: TypeScreens.OUT_ULTRA_SON_Confirmed,
           });
         break;
+      case 'Of In Scarmato':
+        navigation.navigate('sahredOfScreen',
+          {
+            titreOfScreen: TitreOfScreens.ScreenIN_SCARMATO,
+            TypeOfScreen: TypeScreens.IN_SCARMATO,
+          });
+        break;
+      case 'Of Out Scarmato':
+        navigation.navigate('sahredOfScreen',
+          {
+            titreOfScreen: TitreOfScreens.ScreenOUT_SCARMATO,
+            TypeOfScreen: TypeScreens.OUT_SCARMATO,
+          });
+        break;
+      case 'Of Confirmation Scarmato':
+        navigation.navigate('sahredOfScreen',
+          {
+            titreOfScreen: TitreOfScreens.ScreenOUT_SCARMATOConfirmed,
+            TypeOfScreen: TypeScreens.OUT_SCARMATO_Confirmed,
+          });
+        break;
       default:
         break;
     }
@@ -214,7 +241,9 @@ const Index = () => {
       />
       <FlatList style={styles.list}
         contentContainerStyle={styles.listContainer}
-        data={user.idRole === 1 ? menuAdmin : menu}
+        data={menuAdmin && menuAdmin.sort(function (a, b) {
+          return a.id - b.id;
+        })}
         horizontal={false}
         numColumns={2}
         keyExtractor={(item) => {
@@ -291,9 +320,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   subTitle: {
-    marginTop: "10%",
+    marginTop: '10%',
     fontSize: 18,
-    fontWeight: "900",
+    fontWeight: '900',
     flex: 1,
     color: '#FFFFFF',
   },

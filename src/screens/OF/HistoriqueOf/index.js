@@ -33,7 +33,6 @@ const Index = props => {
         //let x = etatOf();
         setVisible(true)
         getOfs(userToken).then((result) => {
-            console.log(result)
             setOfList(result);
             setOfListBackup(result);
             setVisible(false)
@@ -69,7 +68,6 @@ const Index = props => {
                 } else {
 
                     getOfs(userToken).then((result) => {
-                        console.log(result)
                         setOfList(result);
                         setVisible(false)
                     }).catch((err) => {
@@ -159,10 +157,14 @@ const Index = props => {
                 renderItem={({ item }) => {
                     let borderColor;//= item.trackOf.statusOf.includes('Urgent') ? '#FF4500' : null;
                     switch (item.trackOf.statusOf) {
-                        case "Urgent": borderColor = '#FF4500'; break;
-                        case "Urgent,Partiel": borderColor = '#FFCC00'; break;
-                        case "Normal,Partiel": borderColor = '#FF9966'; break;
-                        default: borderColor = null; break;
+                        case 'Urgent': borderColor = StatusColors.Urgent; break;
+                        case 'Urgent,Partiel': borderColor = StatusColors.UrgentPartielle; break;
+                        case 'Normal,Partiel': borderColor = StatusColors.NormalPartielle; break;
+                        case 'Retard': borderColor = StatusColors.Retard; break;
+                        case 'StoppeP': borderColor = StatusColors.StoppeP; break;
+                        case 'StoppeQ': borderColor = StatusColors.StoppeQ; break;
+                        case 'Annulé': borderColor = StatusColors.Annuler; break;
+                        default: borderColor = StatusColors.Normal; break;
                     }
 
 

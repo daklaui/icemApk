@@ -125,7 +125,7 @@ const App = () => {
           );
           await AsyncStorage.setItem('user', JSON.stringify({token, user}));
           dispatch({type: 'SING_IN_SUCCESS', token, user});
-          console.log(token);
+          console.log('token', token);
         } catch (error) {
           dispatch({type: 'SING_IN_ERROR', error});
           console.log(error);

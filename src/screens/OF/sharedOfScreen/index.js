@@ -1,13 +1,12 @@
 /* eslint-disable prettier/prettier */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { AuthContext } from 'src/utils/auth-context';
 import Text from 'src/components/Text';
-import * as themeColors from 'src/configs/themes';
 import { colors } from 'react-native-elements';
 import { getDateCustom } from 'src/utils/time';
-import { GetOfByActionneur, getOfByEtatStatus, getOfByStatus, getOfsByEtat, GetOfTracksByOfName, getSearchUsersByEtat, GetUsersByEtat } from '../../../services/of-services';
+import { GetHistoriqueOf, GetOfByActionneur, getOfByEtatStatus, getOfsByEtat, GetOfTracksByOfName, getSearchUsersByEtat, GetUsersByEtat } from '../../../services/of-services';
 import Header from 'src/containers/Header';
 import Icon from 'src/components/Icon';
 import { TypeScreens } from '../../../configs/typeOfScreens';
@@ -25,7 +24,6 @@ const Index = props => {
     const TypeOfScreen = route?.params.TypeOfScreen;
     const { userToken } = React.useContext(AuthContext);
     const [ofList, setOfList] = useState([]);
-    const { colors } = themeColors.themeLight;
     const [visible, setVisible] = useState(true);
     const refRBSheet = useRef();
     const searchByDate = useRef();
@@ -33,10 +31,13 @@ const Index = props => {
     const searchByUser = useRef();
     const etatOf = () => {
         switch (TypeOfScreen) {
-            case TypeScreens.Magasin: return 'Magasin';
+            case TypeScreens.Annuler: return 'Annuler';
             case TypeScreens.CoupeReception: return 'CoupeReception';
             case TypeScreens.IN_coupe: return 'IN_coupe';
             case TypeScreens.Out_coupe: return 'Out_coupe';
+            case TypeScreens.IN_SCARMATO: return 'IN_SCARMATO';
+            case TypeScreens.OUT_SCARMATO: return 'OUT_SCARMATO';
+            case TypeScreens.OUT_SCARMATO_Confirmed: return 'OUT_SCARMATO_Confirmed';
             case TypeScreens.In_Sertissage: return 'In_Sertissage';
             case TypeScreens.Out_Sertissage: return 'Out_Sertissage';
             case TypeScreens.IN_Magasin_fils: return 'IN_Magasin_fils';
@@ -79,7 +80,6 @@ const Index = props => {
         setTimer(
             setTimeout(() => {
                 let x = etatOf();
-
                 setVisible(true);
                 if (change && change.length > 0) {
                     if (modeOfSearch) {
@@ -98,7 +98,6 @@ const Index = props => {
                         });
                     }
                 } else {
-
                     getOfsByEtat(userToken, x).then((result) => {
                         setOfList(result);
                         setVisible(false);
@@ -106,8 +105,6 @@ const Index = props => {
                         console.log(err);
                     });
                 }
-
-
             }, valueOfCounter)
         );
     }
@@ -140,7 +137,6 @@ const Index = props => {
         let x = etatOf();
         setVisible(true);
         GetOfTracksByOfName(userToken, null, x, getDateCustomApi(new Date(value.dateString))).then((result) => {
-            console.log(result)
             setOfList(result);
             setVisible(false);
             searchByDate.current.close()
@@ -183,7 +179,6 @@ const Index = props => {
             console.log(err);
         });
         GetUsersByEtat(userToken, x).then((result) => {
-            console.log(result)
             setUsers(result);
         }).catch((err) => {
             console.log(err);
@@ -274,15 +269,21 @@ const Index = props => {
                         case 'Retard': borderColor = StatusColors.Retard; break;
                         case 'StoppeP': borderColor = StatusColors.StoppeP; break;
                         case 'StoppeQ': borderColor = StatusColors.StoppeQ; break;
-                        case 'Annuler': borderColor = StatusColors.Annuler; break;
+                        case 'Annulé': borderColor = StatusColors.Annuler; break;
                         default: borderColor = StatusColors.Normal; break;
                     }
 
-
+                    const onChangeScreen = (item) => {
+                        GetHistoriqueOf(userToken, item.trackOf.noOf).then((result) => {
+                            navigation.navigate('validationOf', { item: item, ListCommantaires: result })
+                        }).catch((err) => {
+                            console.log(err);
+                        });
+                    }
                     return (
 
-                        <TouchableOpacity style={[styles.card, { borderColor: borderColor }]}
-                            onPress={() => {  navigation.navigate('validationOf', { item: item }) }}>
+                        <TouchableOpacity key={item.trackOf.dateAction} style={[styles.card, { borderColor: borderColor }]}
+                            onPress={() => onChangeScreen(item)}>
                             <View style={styles.cardContent}>
                                 {/*<Text style={[styles.description, getDescriptionStyle(item)]}>{item.description}</Text>*/}
                                 <View style={{

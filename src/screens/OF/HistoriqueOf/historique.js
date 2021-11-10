@@ -12,6 +12,7 @@ import Header from 'src/containers/Header';
 import Icon from 'src/components/Icon';
 import { TypeScreens } from '../../../configs/typeOfScreens';
 import AnimatedLoader from 'react-native-animated-loader';
+import { StatusColors } from '../../../configs/colors';
 const historique = props => {
     const navigation = useNavigation();
     const { route } = props;
@@ -26,7 +27,6 @@ const historique = props => {
         //let x = etatOf();
         setVisible(true)
         GetHistoriqueOf(userToken,noOf).then((result) => {
-            console.log(result)
             setOfList(result);
             setVisible(false)
         }).catch((err) => {
@@ -71,16 +71,20 @@ const historique = props => {
                 renderItem={({ item }) => {
                     let borderColor;//= item.trackOf.statusOf.includes('Urgent') ? '#FF4500' : null;
                     switch (item.trackOf.statusOf) {
-                        case "Urgent": borderColor = '#FF4500'; break;
-                        case "Urgent,Partiel": borderColor = '#FFCC00'; break;
-                        case "Normal,Partiel": borderColor = '#FF9966'; break;
-                        default: borderColor = null; break;
+                        case 'Urgent': borderColor = StatusColors.Urgent; break;
+                        case 'Urgent,Partiel': borderColor = StatusColors.UrgentPartielle; break;
+                        case 'Normal,Partiel': borderColor = StatusColors.NormalPartielle; break;
+                        case 'Retard': borderColor = StatusColors.Retard; break;
+                        case 'StoppeP': borderColor = StatusColors.StoppeP; break;
+                        case 'StoppeQ': borderColor = StatusColors.StoppeQ; break;
+                        case 'Annulé': borderColor = StatusColors.Annuler; break;
+                        default: borderColor = StatusColors.Normal; break;
                     }
 
 
                     return (
 
-                        <TouchableOpacity style={[styles.card, { borderColor: borderColor }]} onPress={() => navigation.navigate('validationOf', { item: item })}>
+                        <TouchableOpacity style={[styles.card, { borderColor: borderColor }]}>
                             <View style={styles.cardContent}>
                                 {/*<Text style={[styles.description, getDescriptionStyle(item)]}>{item.description}</Text>*/}
                                 <Text style={[styles.titre]}>{item.trackOf.noOf}({item.trackOf.etat})</Text>

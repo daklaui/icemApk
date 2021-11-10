@@ -1,7 +1,10 @@
 export const TypeScreens = {
   Planification: 'Planification',
-  Magasin: 'Magasin',
+  Annuler: 'Annuler',
   CoupeReception: 'CoupeReception',
+  IN_SCARMATO: 'IN_SCARMATO',
+  OUT_SCARMATO: 'OUT_SCARMATO',
+  OUT_SCARMATO_Confirmed: 'OUT_SCARMATO_Confirmed',
   IN_coupe: 'IN_coupe',
   Out_coupe: 'Out_coupe',
   In_Sertissage: 'In_Sertissage',
@@ -19,9 +22,12 @@ export const TypeScreens = {
 };
 
 export const TitreOfScreens = {
-  ScreenMagasin: 'Ofs dans magasin',
+  ScreenAnnuler: 'Ofs  Annuler',
   ScreenCoupeReception: 'Ofs En attendant la coupe',
   ScreenIN_coupe: 'Ofs en cours de la coupe',
+  ScreenIN_SCARMATO: 'Ofs en cours de scarmato',
+  ScreenOUT_SCARMATO: 'Ofs Sortie de scarmato',
+  ScreenOUT_SCARMATOConfirmed: 'Ofs Confirmer la Sortie de scarmato',
   ScreenOut_coupe: 'Ofs Sortie de la coupe',
   ScreenIn_Sertissage: 'Ofs en cours de la sertissage',
   ScreenOut_Sertissage: 'Ofs Sortie de la sertissage',

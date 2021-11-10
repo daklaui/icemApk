@@ -21,7 +21,6 @@ const ButtonElement = props => {
 
   const bgColor = secondary ? colors.secondaryButton : colors.primary;
   const color = secondary ? colors.text : white;
-  console.log(colors.primary);
   return (
     <Button
       {...rest}

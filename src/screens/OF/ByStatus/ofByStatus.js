@@ -1,10 +1,8 @@
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { AuthContext } from 'src/utils/auth-context';
 import Text from 'src/components/Text';
-import * as themeColors from 'src/configs/themes';
 import { colors } from 'react-native-elements';
 import { getDateCustom } from 'src/utils/time';
 import { getOfsByStatus } from 'src/services/of-services';
@@ -13,12 +11,10 @@ import SweetAlert from 'react-native-sweet-alert';
 import AnimatedLoader from 'react-native-animated-loader';
 const OfsByStatus = props => {
     const { route } = props;
-    const navigation = useNavigation();
     const statusOf = route?.name;
     const { userToken } = React.useContext(AuthContext);
     const [ofList, setOfList] = useState([]);
     const [stateChanged, setIsStateChanged] = useState(false);
-    const { colors } = themeColors.themeLight;
     const [visible, setVisible] = useState(true);
     useEffect(() => {
         setVisible(false);
@@ -40,36 +36,20 @@ const OfsByStatus = props => {
             console.log(err);
         });
     }, [stateChanged]);
-    const getCompletedIcon = (item) => {
-        return 'https://img.icons8.com/flat_round/64/000000/checkmark.png';
-        /*  if (item.completed == 1) {
-            return 'https://img.icons8.com/flat_round/64/000000/checkmark.png';
-          } else {
-            return 'https://img.icons8.com/flat_round/64/000000/delete-sign.png';
-          }*/
-    };
 
-    /*  const getDescriptionStyle = (item) => {
-          if (item.completed == 1) {
-              return { textDecorationLine: 'line-through', fontStyle: 'italic', color: '#808080' };
-          }
-      };*/
     const changeStateOf = (item) => {
         Alert.alert(
-
             "Confirmation",
             "Envoyer l'of en fil d'attente de coupe",
             [
                 {
                     text: "No OK",
                     onPress: () => {
-                        console.log('test')
                         updateStateOf(userToken, {
-                            etat: "Magasin",
+                            etat: "Annuler",
                             idOf: item.trackOf.idOf,
                             statusOf: "false"
                         }).then((resp) => {
-                            console.log(resp)
                             SweetAlert.showAlertWithOptions({
                                 title: '',
                                 subTitle: 'enregistrement a été effectué avec succès.',
@@ -88,7 +68,7 @@ const OfsByStatus = props => {
                 },
                 {
                     text: "OK", onPress: () => {
-                        updateStateOf(userToken, { etat: "Magasin", idOf: item.trackOf.idOf, statusOf: "true" }).then((resp) => {
+                        updateStateOf(userToken, { etat: "CoupeReception", idOf: item.trackOf.idOf, statusOf: "true" }).then((resp) => {
                             SweetAlert.showAlertWithOptions({
                                 title: '',
                                 subTitle: 'enregistrement a été effectué avec succès.',

@@ -3,7 +3,6 @@ import { API } from '../configs/constant';
 
 function generalUrl(url) {
   const baseURL = API + url;
-  console.log(baseURL);
   return {
     baseURL,
   };

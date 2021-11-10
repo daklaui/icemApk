@@ -75,7 +75,6 @@ const Index = (props) => {
         setLoader(false)
         if (data) {
             getUserById(userToken, idUser).then((d)=>{
-                console.log(d)
                 setValue(d.idRole.toString());
                 setuserName(d.userName);
                 setPassword(d.password);

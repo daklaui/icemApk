@@ -21,6 +21,7 @@ import { Calendar } from 'react-native-calendars';
 import { getDateCustomApi } from '../../../utils/time';
 import { ActivityIndicator } from 'react-native';
 import { colors } from 'react-native-elements';
+import Swipeout from 'react-native-swipeout';
 const index = (props) => {
     const { route } = props;
     const [visible, setVisible] = useState(true);
@@ -146,13 +147,11 @@ const index = (props) => {
     const addSelectedItems = (type) => {
         let sendArry = [];
         ofList.forEach((item) => {
-            if (selectedItems.includes(item.no)){
-                sendArry.push({QtProduire: item.quantity, NoOf: item.no, statusOf: type, etat: 'enAttenteDePlanification' });
+            if (selectedItems.includes(item.no)) {
+                sendArry.push({ QtProduire: item.quantity, NoOf: item.no, statusOf: type, etat: 'enAttenteDePlanification' });
             }
         });
-        console.log(sendArry);
         addNewOfATrackerList(userToken, sendArry).then((result) => {
-            console.log(result)
             SweetAlert.showAlertWithOptions({
                 title: '',
                 subTitle: 'enregistrement a été effectué avec succès.',
@@ -166,6 +165,7 @@ const index = (props) => {
                 callback => console.log('callback'));
             setOfList([]);
             setOfList(result);
+            setSelectedItems([]);
         }).catch((err) => {
             console.log(err);
         });
@@ -260,7 +260,7 @@ const index = (props) => {
                     buttonStyle={{ backgroundColor: red }}
                 />
                 <Button
-                    onPress={() =>  addSelectedItems('Normal')}
+                    onPress={() => addSelectedItems('Normal')}
                     buttonStyle={{ backgroundColor: black }}
                     title="Normal"
                 />
@@ -283,37 +283,37 @@ const index = (props) => {
                         return item.id;
                     }}
                     initialNumToRender={10}
-
                     renderItem={({ item }) => {
                         return (
-                            <TouchableOpacity key={item.no} style={[styles.card, { borderColor: item.color }]} onLongPress={() => onLongPressHandel(item)} onPress={() => { clickEventListener(item); }}>
-                                <View style={styles.cardContent}>
-                                    {/*<Text style={[styles.description, getDescriptionStyle(item)]}>{item.description}</Text>*/}
-                                    <View style={{
-                                        flex: 1,
-                                        justifyContent: 'space-between',
-                                        flexDirection: 'row',
-                                    }}>
-                                        <Text style={[styles.titre]}>{item.no}</Text>
-                                        <Text style={[styles.titreSourceN]}>{item.sourceNo}</Text>
+                            <Swipeout key={`of${item.no}`} style={{ backgroundColor: colors.background }} right={swipeoutBtns(item)}>
+                                <TouchableOpacity key={item.no} style={[styles.card, { borderColor: item.color }]} onLongPress={() => onLongPressHandel(item)} onPress={() => { clickEventListener(item); }}>
+                                    <View style={styles.cardContent}>
+                                        <View style={{
+                                            flex: 1,
+                                            justifyContent: 'space-between',
+                                            flexDirection: 'row',
+                                        }}>
+                                            <Text style={[styles.titre]}>{item.no}</Text>
+                                            <Text style={[styles.titreSourceN]}>{item.sourceNo}</Text>
+                                        </View>
+
+                                        <Text style={[styles.description]}>{item.description}</Text>
+                                        <View style={{
+                                            flex: 1,
+                                            alignItems: 'center', // ignore this - we'll come back to it
+                                            justifyContent: 'space-between',
+                                            flexDirection: 'row',
+                                            marginTop: 6,
+                                        }}>
+                                            <Text style={styles.date}>{getDateCustom(item.date_creation_of)}</Text>
+                                            <Text style={styles.quantite}>{'Quantité : ' + item.quantity}</Text>
+
+                                        </View>
+
                                     </View>
-
-                                    <Text style={[styles.description]}>{item.description}</Text>
-                                    <View style={{
-                                        flex: 1,
-                                        alignItems: 'center', // ignore this - we'll come back to it
-                                        justifyContent: 'space-between',
-                                        flexDirection: 'row',
-                                        marginTop: 6,
-                                    }}>
-                                        <Text style={styles.date}>{getDateCustom(item.date_creation_of)}</Text>
-                                        <Text style={styles.quantite}>{'Quantité : ' + item.quantity}</Text>
-
-                                    </View>
-
-                                </View>
-                                {isItemSelected(item.no) && <View style={styles.overlay} />}
-                            </TouchableOpacity>
+                                    {isItemSelected(item.no) && <View style={styles.overlay} />}
+                                </TouchableOpacity>
+                            </Swipeout>
 
                         );
                     }}
