@@ -4,7 +4,12 @@ import {colors} from 'react-native-elements';
 import Text from 'src/components/Text';
 import {StatusColors} from '../configs/colors';
 import {getDateCustom} from '../utils/time';
-const CardOf = ({item, onChangeScreen, selectedItem, longPressHandled}) => {
+const CardOf = ({
+  item,
+  onChangeScreen,
+  selectedItem = undefined,
+  longPressHandled = undefined,
+}) => {
   let borderColor;
   let status = item.statusOf ? item.statusOf : '';
   switch (status) {
@@ -36,10 +41,10 @@ const CardOf = ({item, onChangeScreen, selectedItem, longPressHandled}) => {
 
   return (
     <TouchableOpacity
-      key={item.dateAction}
+      key={item.dateActon}
       style={[styles.card, {borderColor: borderColor}]}
       onPress={() => onChangeScreen(item)}
-      onLongPress={() => longPressHandled(item)}>
+      onLongPress={() => longPressHandled && longPressHandled(item)}>
       <View style={styles.cardContent}>
         {/*<Text style={[styles.description, getDescriptionStyle(item)]}>{item.description}</Text>*/}
         <View style={styles.row}>
@@ -52,12 +57,11 @@ const CardOf = ({item, onChangeScreen, selectedItem, longPressHandled}) => {
             : item.description}
         </Text>
         <View style={[styles.row, {alignItems: 'center', marginTop: 6}]}>
-          <Text style={styles.date}>{getDateCustom(item.dateAction)}</Text>
+          <Text style={styles.date}>{getDateCustom(item.dateActon)}</Text>
           <Text style={styles.quantite}>{`Quantité : ${item.quantity}`}</Text>
         </View>
-       
       </View>
-      {selectedItem(item.no) && <View style={styles.overlay} />}
+      {selectedItem && selectedItem(item.no) && <View style={styles.overlay} />}
     </TouchableOpacity>
   );
 };
@@ -76,8 +80,8 @@ const styles = StyleSheet.create({
   card: {
     shadowColor: '#00000021',
     shadowOffset: {
-        width: 0,
-        height: 6,
+      width: 0,
+      height: 6,
     },
     shadowOpacity: 0.37,
     shadowRadius: 7.49,
@@ -88,7 +92,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 5,
     borderLeftWidth: 6,
-},
+  },
   titre: {
     fontSize: 18,
     flex: 1,

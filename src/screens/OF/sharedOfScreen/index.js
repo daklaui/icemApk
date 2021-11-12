@@ -6,7 +6,7 @@ import { AuthContext } from 'src/utils/auth-context';
 import Text from 'src/components/Text';
 import { colors } from 'react-native-elements';
 import { getDateCustom } from 'src/utils/time';
-import { GetHistoriqueOf, GetOfByActionneur, getOfByEtatStatus, getOfsByEtat, GetOfTracksByOfName, getSearchUsersByEtat, GetUsersByEtat } from '../../../services/of-services';
+import { GetHistoriqueOf, GetOfByActionneur, getOfByEtatStatus, getOfsByEtat, GetOfTracksByOfName, getSearchUsersByEtat, GetUsersByEtat, updateStatus } from '../../../services/of-services';
 import Header from 'src/containers/Header';
 import Icon from 'src/components/Icon';
 import { TypeScreens } from '../../../configs/typeOfScreens';
@@ -20,18 +20,34 @@ import Toggle from 'react-native-toggle-element';
 import CardOf from '../../../components/CardOf';
 import { HeaderSearch } from '../../../components/HeaderSearch';
 import Calander from '../../../components/Calander';
+import DropDownPicker from 'react-native-dropdown-picker';
+import Button from 'src/components/Button';
 const Index = props => {
     const { route } = props;
     const navigation = useNavigation();
     const titreOfScreen = route?.params.titreOfScreen;
     const TypeOfScreen = route?.params.TypeOfScreen;
-    const { userToken } = React.useContext(AuthContext);
+    const { userToken, user } = React.useContext(AuthContext);
     const [ofList, setOfList] = useState([]);
     const [visible, setVisible] = useState(true);
     const refRBSheet = useRef();
     const searchByDate = useRef();
     const searchByStatus = useRef();
     const searchByUser = useRef();
+    const changeStateOf = useRef();
+    const [open, setOpen] = useState(false);
+    const [setSelectedItem, setsetSelectedItem] = useState(null)
+    const [loader, setLoader] = useState(false);
+    const [ListEtats, setListEtats] = useState([
+        { label: 'Normal', value: 'Normal' },
+        { label: 'Urgent', value: 'Urgent' },
+        { label: 'Retarder', value: 'Retarder' },
+        { label: 'Stopper Production', value: 'Stopper Production' },
+        { label: 'Annuler', value: 'Annuler' },
+        { label: 'Stopper', value: 'Stopper' },
+        { label: 'Qualité', value: 'Qualité' }
+    ]);
+    const [newStatus, setNewStatus] = useState(null)
     const etatOf = () => {
         switch (TypeOfScreen) {
             case TypeScreens.Annuler: return 'Annuler';
@@ -61,6 +77,7 @@ const Index = props => {
     const [users, setUsers] = useState([]);
     const [currenDate, setCurrentDate] = useState(new Date());
     const [modeOfSearch, setModeOfSearch] = useState(true);
+    const timeoutRef = useRef(null);
     LocaleConfig.locales.fr = {
         monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
         monthNamesShort: ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'],
@@ -69,72 +86,98 @@ const Index = props => {
         today: 'Aujourd\'hui',
     };
     LocaleConfig.defaultLocale = 'fr';
-    const onChangeText = (value) => {
-        setText(value);
-        changeDelay(value.length > 0 ? value : null);
-    }
 
-    function changeDelay(change) {
-        let valueOfCounter = change !== null && change.length > 0 ? 700 : 0;
-        if (timer) {
-            clearTimeout(timer);
-            setTimer(null);
-        }
-        setTimer(
-            setTimeout(() => {
-                let x = etatOf();
+
+
+    useEffect(() => {
+        let x = etatOf();
+        if (text && text.length > 0) {
+            if (timeoutRef.current !== null) {
+                clearTimeout(timeoutRef.current);
+            }
+
+            timeoutRef.current = setTimeout(() => {
                 setVisible(true);
-                if (change && change.length > 0) {
-                    if (modeOfSearch) {
-                        GetOfTracksByOfName(userToken, change, null, x, null).then((result) => {
-                            setOfList(result);
-                            setVisible(false);
-                        }).catch((err) => {
-                            console.log(err);
-                        });
-                    } else {
-                        GetOfTracksByOfName(userToken, null, change, x, null).then((result) => {
-                            setOfList(result);
-                            setVisible(false);
-                        }).catch((err) => {
-                            console.log(err);
-                        });
-                    }
+                timeoutRef.current = null;
+
+                if (modeOfSearch) {
+                    GetOfTracksByOfName(userToken, text, null, x, null).then((result) => {
+                        setOfList(result);
+                        setVisible(false);
+                    }).catch((err) => {
+                        console.log(err);
+                    });
                 } else {
-                    getOfsByEtat(userToken, x).then((result) => {
+                    GetOfTracksByOfName(userToken, null, text, x, null).then((result) => {
                         setOfList(result);
                         setVisible(false);
                     }).catch((err) => {
                         console.log(err);
                     });
                 }
-            }, valueOfCounter)
-        );
-    }
-    const onChangeSearchUserText = (value) => {
-        setUserSearchText(value);
-        changeDelayUser(value.length > 0 ? value : null);
+
+            }, 500);
+        }
+        else {
+            getOfsByEtat(userToken, x).then((result) => {
+                setOfList(result);
+                setVisible(false);
+            }).catch((err) => {
+                console.log(err);
+            });
+        }
+    }, [text]);
+
+    const updateStatusOf = () => {
+        setLoader(true)
+        updateStatus(userToken, { IdOf: setSelectedItem.idOf, statusOf: newStatus }).then((data) => {
+            changeStateOf.current.close();
+            setLoader(false)
+            let x = etatOf();
+            setVisible(true);
+            getOfsByEtat(userToken, x).then((result) => {
+                setOfList(result);
+                setVisible(false);
+            }).catch((err) => {
+                console.log(err);
+            });
+        }).catch((e) => { console.log(e); setLoader(false) })
     }
 
-    function changeDelayUser(change) {
-        let valueOfCounter = change !== null && change.length > 0 ? 700 : 0;
-        if (timer) {
-            clearTimeout(timer);
-            setTimer(null);
-        }
-        setTimer(
-            setTimeout(() => {
-                let x = etatOf();
+    useEffect(() => {
+        let x = etatOf();
+        if (searchUserText && searchUserText.length > 0) {
+            if (timeoutRef.current !== null) {
+                clearTimeout(timeoutRef.current);
+            }
+            timeoutRef.current = setTimeout(() => {
                 setVisible(true);
-                getSearchUsersByEtat(userToken, x, change).then((result) => {
+                timeoutRef.current = null;
+                getSearchUsersByEtat(userToken, x, searchUserText).then((result) => {
                     setUsers(result);
                     setVisible(false);
                 }).catch((err) => {
                     console.log(err);
                 });
-            }, valueOfCounter)
-        );
+            }, 500);
+        } else {
+            GetUsersByEtat(userToken, x).then((result) => {
+                setVisible(false);
+                setUsers(result);
+            }).catch((err) => {
+                console.log(err);
+            });
+        }
+    }, [searchUserText]);
+    const onChangeText = (value) => {
+        setText(value);
+        //    changeDelay(value.length > 0 ? value : null);
     }
+
+    const onChangeSearchUserText = (value) => {
+        setUserSearchText(value);
+    }
+
     const serachByDay = (value) => {
 
         let x = etatOf();
@@ -193,11 +236,17 @@ const Index = props => {
     }, [useIsFocused()]);
 
     const onChangeScreen = (item) => {
-        GetHistoriqueOf(userToken, item.trackOf.noOf).then((result) => {
+        GetHistoriqueOf(userToken, item.no).then((result) => {
+            console.log(result)
             navigation.navigate('validationOf', { item: item, ListCommantaires: result })
         }).catch((err) => {
             console.log(err);
         });
+    }
+    const onLongPressHandled = (item) => {
+        setsetSelectedItem(item)
+        setNewStatus(null);
+        changeStateOf.current.open();
     }
     return (
         <View style={styles.container}>
@@ -232,14 +281,28 @@ const Index = props => {
                 overlayColor="rgba(255,255,255,0.75)"
                 animationStyle={styles.lottie}
                 speed={1} />
-            <HeaderSearch onChangeText={(val) => onChangeText()} setModeOfSearch={(mode) => setModeOfSearch(mode)}/>
+            <HeaderSearch onChangeText={(val) => onChangeText(val)} setModeOfSearch={(mode) => setModeOfSearch(mode)} />
             {!visible && <FlatList
                 style={styles.tasks}
                 data={ofList}
                 keyExtractor={(item) => {
                     return item.id;
                 }}
-                renderItem={(item) => <CardOf item={item} onChangeScreen={(item) => onChangeScreen(item)} />} />}
+                renderItem={({ item }) => {
+                    const itemList = {
+                        idOf: item.trackOf.idOf,
+                        no: item.trackOf.noOf,
+                        sourceNo: item.ofDto.sourceNo,
+                        statusOf: item.trackOf.statusOf,
+                        actionneur: item.trackOf.actionneur,
+                        dateActon: item.trackOf.dateAction,
+                        quantity: item.trackOf.qtProduire,
+                        etat: item.trackOf.etat,
+                    }
+                    return user.idRole === 'Logistique' ?
+                        <CardOf item={itemList} onChangeScreen={(item) => onChangeScreen(item)} longPressHandled={(item) => onLongPressHandled(item)} /> :
+                        <CardOf item={itemList} onChangeScreen={(item) => onChangeScreen(item)} />
+                }} />}
 
             <RBSheet
                 ref={refRBSheet}
@@ -301,8 +364,60 @@ const Index = props => {
                 </View>
             </RBSheet>
 
+
+            <RBSheet
+                ref={changeStateOf}
+                height={400}
+                animationType="fade"
+                closeOnDragDown={true}
+                closeOnPressMask={true}
+                customStyles={{
+                    wrapper: {
+                        backgroundColor: '#000000CC',
+                    },
+                    draggableIcon: {
+                        backgroundColor: '#000',
+                    },
+                }}
+            >
+                <View style={styles.listContainer}>
+                    <Text style={styles.listTitleChangeState}>Changer l'état d'un of</Text>
+                    <View style={{ width: "70%", display: "flex", flexDirection: "row", alignItems: "baseline" }}>
+                        <DropDownPicker
+                            style={{
+                                borderColor: colors.border,
+                                borderRadius: 4,
+                                width: "90%"
+
+                            }}
+                            open={open}
+                            value={newStatus}
+                            items={ListEtats}
+                            setItems={setListEtats}
+                            setValue={setNewStatus}
+                            setOpen={setOpen}
+                            dropDownContainerStyle={{
+                                borderColor: colors.border,
+                                borderRadius: 4,
+                            }}
+                            placeholder="merci de choisir une status"
+                        />
+                        <Button
+                            title={'Enregistrer'}
+                            containerStyle={styles.button}
+                            onPress={() => updateStatusOf()}
+                            disabled={newStatus === null ? true : false}
+                            loading={loader}
+                        />
+                    </View>
+
+
+                </View>
+            </RBSheet>
+
+
             {/*   ModalSearchByTExt  */}
-            <Calander refCalander={searchByDate} serachByDay={(day) => serachByDay(day)}/>
+            <Calander refCalander={searchByDate} serachByDay={(day) => serachByDay(day)} />
             {/*   searchByStatus  */}
             <RBSheet
                 ref={searchByStatus}
@@ -554,9 +669,15 @@ const styles = StyleSheet.create({
     },
     listTitle: {
         padding: 10,
-        fontSize: 22,
+        fontSize: 18,
         marginTop: 10,
         marginBottom: 15,
+        color: '#666',
+    },
+    listTitleChangeState: {
+        padding: 10,
+        fontSize: 18,
+        marginTop: 10,
         color: '#666',
     },
     listButton: {
@@ -586,6 +707,9 @@ const styles = StyleSheet.create({
     listLabelUsers: {
         fontWeight: 'bold',
         fontSize: 18,
+    },
+    button: {
+        marginVertical: 30,
     },
 });
 export default Index;

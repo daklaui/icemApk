@@ -5,7 +5,7 @@ import Toggle from 'react-native-toggle-element';
 import {gray5, green} from '../configs/colors';
 export const HeaderSearch = ({onChangeText, setModeOfSearch}) => {
   const [searchText, setSearchText] = useState('');
-  const [modeOfSearch, setModeLocalOfSearch] = useState(false);
+  const [modeOfSearch, setModeLocalOfSearch] = useState(true);
   const onChangeSearchText = val => {
     onChangeText(val);
     setSearchText(val);
@@ -23,7 +23,7 @@ export const HeaderSearch = ({onChangeText, setModeOfSearch}) => {
         containerStyle={styles.textInput}
         cancelButton={false}
         value={searchText}
-        onChangeText={val => onChangeSearchText(val)}
+        onChangeText={val => {onChangeSearchText(val);}}
       />
       <View style={styles.searchIcon}>
         <Toggle

@@ -9,6 +9,7 @@ import { getOfsByStatus } from 'src/services/of-services';
 import { updateStateOf } from '../../../services/of-services';
 import SweetAlert from 'react-native-sweet-alert';
 import AnimatedLoader from 'react-native-animated-loader';
+import CardOf from '../../../components/CardOf';
 const OfsByStatus = props => {
     const { route } = props;
     const statusOf = route?.name;
@@ -47,7 +48,7 @@ const OfsByStatus = props => {
                     onPress: () => {
                         updateStateOf(userToken, {
                             etat: "Annuler",
-                            idOf: item.trackOf.idOf,
+                            idOf: item.idOf,
                             statusOf: "false"
                         }).then((resp) => {
                             SweetAlert.showAlertWithOptions({
@@ -68,7 +69,7 @@ const OfsByStatus = props => {
                 },
                 {
                     text: "OK", onPress: () => {
-                        updateStateOf(userToken, { etat: "CoupeReception", idOf: item.trackOf.idOf, statusOf: "true" }).then((resp) => {
+                        updateStateOf(userToken, { etat: "CoupeReception", idOf: item.idOf, statusOf: "true" }).then((resp) => {
                             SweetAlert.showAlertWithOptions({
                                 title: '',
                                 subTitle: 'enregistrement a été effectué avec succès.',
@@ -107,35 +108,17 @@ const OfsByStatus = props => {
                     return item.id;
                 }}
                 renderItem={({ item }) => {
-                    let borderColor = item.trackOf.statusOf === 'Urgent' ? '#FF4500' : null;
+                    const itemList = {
+                        idOf: item.trackOf.idOf,
+                        no: item.trackOf.noOf,
+                        sourceNo: item.ofDto.sourceNo,
+                        statusOf :item.trackOf.statusOf,
+                        actionneur : item.trackOf.actionneur,
+                        dateActon: item.trackOf.dateAction,
+                        quantity: item.trackOf.qtProduire
+                    }
                     return (
-
-                        <TouchableOpacity style={[styles.card, { borderColor: borderColor }]} onPress={() => changeStateOf(item)}>
-                            <View style={styles.cardContent}>
-                                {/*<Text style={[styles.description, getDescriptionStyle(item)]}>{item.description}</Text>*/}
-                                <View style={{
-                                            flex: 1,
-                                            justifyContent: 'space-between',
-                                            flexDirection: 'row',
-                                        }}>
-                                            <Text style={[styles.titre]}>{item.trackOf.noOf}</Text>
-                                            <Text style={[styles.titreSourceN]}>{item.ofDto.sourceNo}</Text>
-                                        </View>
-                                <Text style={[styles.description]}>{'actionneur : ' + item.trackOf.actionneur}</Text>
-                                <View style={{
-                                    flex: 1,
-                                    alignItems: 'center', // ignore this - we'll come back to it
-                                    justifyContent: 'space-between',
-                                    flexDirection: 'row',
-                                    marginTop: 6,
-                                }}>
-                                    <Text style={styles.date}>{getDateCustom(item.trackOf.dateAction)}</Text>
-                                    <Text style={styles.quantite}>{'Quantité : ' + item.trackOf.qtProduire}</Text>
-
-                                </View>
-                            </View>
-                        </TouchableOpacity>
-
+                        <CardOf item={itemList} onChangeScreen={(item) => changeStateOf(item)} />
                     );
                 }} />}
         </View>

@@ -13,6 +13,8 @@ export const getOfsByEtat = (userToken, etat) =>
   request.get('Of/getOfByEtat/' + etat, {}, userToken);
 export const addNewOfATracker = (userToken, of) =>
   request.post('Of/addTrackNewOf', JSON.stringify(of), 'POST', userToken);
+export const updateStatus = (userToken, of) =>
+  request.post('Of/updateStatusOf', JSON.stringify(of), 'POST', userToken);
 export const addNewOfATrackerList = (userToken, of) =>
   request.post('Of/addTrackNewOfs', JSON.stringify(of), 'POST', userToken);
 export const updateStateOf = (userToken, of) =>

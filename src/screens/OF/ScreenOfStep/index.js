@@ -19,13 +19,12 @@ const index = (props) => {
   const item = route?.params?.item ?? null;
   const ListCommantaires = route?.params?.ListCommantaires ?? null;
   const [loader, setLoader] = useState(false);
-  const [qty, setQty] = useState(item.trackOf.qtProduire);
+  const [qty, setQty] = useState(item.quantity);
   const [cmntr, setCmntr] = useState('');
   const [isNotValidForm, setIsNotValidForm] = useState(true);
   const [historique, setHistorique] = useState(ListCommantaires);
 
   useEffect(() => {
-    console.log(user);
     if (cmntr && cmntr.length > 0 && qty && qty.toString().length > 0) {
       setIsNotValidForm(false);
     } else {
@@ -35,9 +34,10 @@ const index = (props) => {
   }, [cmntr, qty]);
   const ListCommantairesFn = () => useMemo(
     () => {
-      console.log(historique);
+      console.log(historique)
       return <View style={{ paddingHorizontal: '7%' }}>
         {
+        
           historique.map((item) => {
             return item.trackOf.commentaire && item.trackOf.commentaire.length > 0 ?
             <><TouchableOpacity key={item.trackOf.dateAction} style={[styles.card]}>
@@ -157,13 +157,13 @@ const index = (props) => {
     }
   };
   const clickSave = () => {
-    if (Number(qty) <= Number(item.trackOf.qtProduire)) {
+    if (Number(qty) <= Number(item.quantity)) {
       setLoader(true);
-      console.log(item.trackOf.etat);
-      let x = screenToBack(item.trackOf.etat);
+      console.log(item.etat);
+      let x = screenToBack(item.etat);
       updateStateOf(userToken, {
-        etat: nextEtatOf(item.trackOf.etat),
-        idOf: item.trackOf.idOf,
+        etat: nextEtatOf(item.etat),
+        idOf: item.idOf,
         QtProduire: Number(qty),
         Commentaire: cmntr ? cmntr : '',
       }).then((resp) => {
@@ -210,7 +210,7 @@ const index = (props) => {
       <KeyboardAvoidingView behavior="height" style={styles.keyboard}>
 
         <ScrollView showsVerticalScrollIndicator={false}>
-          {item.trackOf.etat !== 'OUT_SCARMATO_Confirmed' && item.trackOf.etat !== 'OUT_ULTRA_SON_Confirmed' &&
+          {item.etat !== 'OUT_SCARMATO_Confirmed' && item.etat !== 'OUT_ULTRA_SON_Confirmed' &&
             <View style={styles.content}>
               {user.idRole !== 'Magasinier' && <Input
                 label={'Quantité'}

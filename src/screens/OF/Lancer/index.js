@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, Image, Alert, TextInput } from 'react-native';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { View, StyleSheet, FlatList, Alert } from 'react-native';
 import Header from 'src/containers/Header';
 import Icon from 'src/components/Icon';
 import { useNavigation } from '@react-navigation/native';
@@ -9,13 +9,10 @@ import Text from 'src/components/Text';
 import * as themeColors from 'src/configs/themes';
 import { getAllOfs } from 'src/services/of-services';
 import Button from 'src/components/Button';
-import { getDateCustom } from 'src/utils/time';
 import { addNewOfATracker, FilterOfs, addNewOfATrackerList } from '../../../services/of-services';
 import SweetAlert from 'react-native-sweet-alert';
 import AnimatedLoader from 'react-native-animated-loader';
-import RBSheet from 'react-native-raw-bottom-sheet';
 import { black, red } from '../../../configs/colors';
-import { Calendar } from 'react-native-calendars';
 import { getDateCustomApi } from '../../../utils/time';
 import { ActivityIndicator } from 'react-native';
 import { colors } from 'react-native-elements';
@@ -23,21 +20,19 @@ import Swipeout from 'react-native-swipeout';
 import { HeaderSearch } from '../../../components/HeaderSearch';
 import CardOf from '../../../components/CardOf';
 import Calander from '../../../components/Calander';
-const index = (props) => {
+const Index = (props) => {
     const { route } = props;
     const [visible, setVisible] = useState(true);
-    const [loadingMore, setLoadingMoare] = useState(false);
+    const [loadingMore] = useState(false);
     const navigation = useNavigation();
-    const { user, signOut, userToken } = React.useContext(AuthContext);
+    const { userToken } = React.useContext(AuthContext);
     const [ofList, setOfList] = useState([]);
     const [modeOfSearch, setModeOfSearch] = useState(true);
     const [searchText, setSearchText] = useState('');
-    const [timer, setTimer] = useState(null);
     const { colors } = themeColors.themeLight;
-    const [currenDate, setCurrentDate] = useState(new Date());
     const [selectedItems, setSelectedItems] = useState([]);
     const typeOfSearch = useRef(null);
-
+    const timeoutRef = useRef(null);
     useEffect(() => {
         getAllOfs(userToken).then((result) => {
             //   console.log(result);
@@ -48,6 +43,61 @@ const index = (props) => {
         });
 
     }, []);
+
+    useEffect(() => {
+        if (searchText.length > 0) {
+            if (timeoutRef.current !== null) {
+                clearTimeout(timeoutRef.current);
+            }
+
+            timeoutRef.current = setTimeout(() => {
+                setVisible(true);
+                timeoutRef.current = null;
+                if (searchText.length > 0) {
+                    if (modeOfSearch) {
+                        getOfsBySearchText(searchText + '', null);
+                    } else {
+                        getOfsBySearchText(null, searchText + '');
+                    }
+                }
+                else {
+                    getAllOfs(userToken).then((result) => {
+                        setOfList(result);
+                        setVisible(false);
+                    }).catch((err) => {
+                        console.log(err);
+                    });
+                }
+            }, 500);
+        }else
+        {
+            setVisible(true);
+            getAllOfs(userToken).then((result) => {
+                setOfList(result);
+                setVisible(false);
+            }).catch((err) => {
+                console.log(err);
+            });
+        }
+    }, [searchText]);
+
+
+    const RenderItem = ({ item }) => {
+        const itemList = {
+            no: item.no,
+            sourceNo: item.sourceNo,
+            description: item.description,
+            dateActon: item.date_creation_of,
+            quantity: item.quantity
+        }
+        return (
+            <Swipeout key={`of${item.no}`} style={{ backgroundColor: colors.background }} right={swipeoutBtns(item)}>
+                <CardOf item={itemList} onChangeScreen={(item) => clickEventListener(item)} selectedItem={(no) => isItemSelected(no)} longPressHandled={(item) => onLongPressHandel(item)} />
+            </Swipeout>
+
+        );
+
+    }
     const clickEventListener = (item) => {
         if (selectedItems.length > 0) {
             return onLongPressHandel(item);
@@ -83,7 +133,6 @@ const index = (props) => {
                 onPress: () => {
                     addOf({ QtProduire: item.quantity, NoOf: item.no, statusOf: 'Urgent', etat: 'enAttenteDePlanification' });
                 },
-
             },
             {
                 text: 'Normal',
@@ -100,11 +149,10 @@ const index = (props) => {
 
     const onChangeSearchText = (value) => {
         setSearchText(value);
-        displayResult(value);
+        //  displayResult(value);
     };
 
     const getOfsBySearchText = (name, noSource, date) => {
-        setVisible(true);
         FilterOfs(userToken, name, noSource, date).then((data) => {
             setOfList(data);
             setVisible(false);
@@ -114,38 +162,8 @@ const index = (props) => {
             console.log(error);
             date && typeOfSearch.current.close();
         });
-        setSelectedItems([]);
     };
 
-    function displayResult(value) {
-        let valueOfCounter = 1000;
-        if (timer) {
-            clearTimeout(timer);
-            setTimer(null);
-        }
-        setTimer(
-            setTimeout(() => {
-                if (value.length > 0) {
-                    if (modeOfSearch) {
-                        getOfsBySearchText(value + '', null);
-                    } else {
-                        getOfsBySearchText(null, value + '');
-                    }
-                }
-                else {
-                    setVisible(true);
-                    getAllOfs(userToken).then((result) => {
-                        //   console.log(result);
-                        setOfList(result);
-                        setVisible(false);
-                    }).catch((err) => {
-                        console.log(err);
-                    });
-                }
-
-            }, valueOfCounter)
-        );
-    }
     const addSelectedItems = (type) => {
         let sendArry = [];
         ofList.forEach((item) => {
@@ -257,23 +275,8 @@ const index = (props) => {
                         return item.id;
                     }}
                     initialNumToRender={10}
-                    renderItem={({ item }) => {
-                        const itemList = {
-                            no: item.no,
-                            sourceNo: item.sourceNo,
-                            description: item.description,
-                            dateActon: item.date_creation_of,
-                            quantity: item.quantity
-                        }
-                        return (
-                            <Swipeout key={`of${item.no}`} style={{ backgroundColor: colors.background }} right={swipeoutBtns(item)}>
-                                <CardOf item={itemList} onChangeScreen={(item) => clickEventListener(item)} selectedItem={(no) => isItemSelected(no)} longPressHandled={(item) => onLongPressHandel(item)} />
-                            </Swipeout>
-
-                        );
-                    }}
+                    renderItem={(item) => RenderItem(item)}
                     ListFooterComponent={() => loadingMore && <View style={{ margin: '10%' }}><ActivityIndicator /></View>}
-
                 />
             }
             <Calander refCalander={typeOfSearch} serachByDay={(day) => serachByDay(day)} />
@@ -415,4 +418,4 @@ const styles = StyleSheet.create({
         top: 0,
     },
 });
-export default index;
+export default Index;
